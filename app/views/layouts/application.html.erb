@@ -22,14 +22,7 @@
       <% if session[:user_id].nil? %>
         <a href="<%= login_path %>" class="btn btn-outline-dark">Login</a>
       <% else %>
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <span class="navbar-text text-dark"><%= session[:name] %></span>
-          </li>
-          <li class="nav-item">
-            <a href="<%= logout_path %>" class="nav-link">Logout</a>
-          </li>
-        </ul>
+        <%= render 'logged_in_indicator' %>
       <% end %>
     </div>
   </nav>
