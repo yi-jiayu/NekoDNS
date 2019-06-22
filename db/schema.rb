@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_21_072544) do
+ActiveRecord::Schema.define(version: 2019_06_22_063711) do
 
   create_table "domains", force: :cascade do |t|
     t.string "root"
@@ -18,6 +18,16 @@ ActiveRecord::Schema.define(version: 2019_06_21_072544) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_domains_on_user_id"
+  end
+
+  create_table "records", force: :cascade do |t|
+    t.integer "domain_id", null: false
+    t.string "name"
+    t.string "type"
+    t.integer "ttl"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["domain_id"], name: "index_records_on_domain_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -29,4 +39,5 @@ ActiveRecord::Schema.define(version: 2019_06_21_072544) do
   end
 
   add_foreign_key "domains", "users"
+  add_foreign_key "records", "domains"
 end

@@ -8,7 +8,7 @@
       <li class="list-group-item">You haven't added any domains yet!</li>
     <% else %>
       <% @domains.each do |domain| %>
-        <li class="list-group-item"><%= domain.root %></li>
+        <li class="list-group-item list-group-item-action"><%= domain.root %></li>
       <% end %>
     <% end %>
   </ul>

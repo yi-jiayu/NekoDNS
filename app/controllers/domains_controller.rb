@@ -8,7 +8,7 @@ class DomainsController < ApplicationController
 
   def create
     root = params.require(:root)
-    Domain.create(root: root, user: current_user)
-    redirect to domains_path
+    DomainService.create_domain(current_user, root)
+    redirect_to domains_path
   end
 end
