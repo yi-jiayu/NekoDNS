@@ -2,12 +2,14 @@
 
 <a href="<%= new_domain_path %>" class="btn btn-primary">Add a domain</a>
 
-<ul class="list-group">
-  <% if @domains.empty? %>
-    <li class="list-group-item">You haven't added any domains yet!</li>
-  <% else %>
-    <% @domains.each do |domain| %>
-      <li class="list-group-item"><%= domain.root %></li>
+<div class="my-3">
+  <ul class="list-group">
+    <% if @domains.empty? %>
+      <li class="list-group-item">You haven't added any domains yet!</li>
+    <% else %>
+      <% @domains.each do |domain| %>
+        <li class="list-group-item"><%= domain.root %></li>
+      <% end %>
     <% end %>
-  <% end %>
-</ul>
+  </ul>
+</div>
