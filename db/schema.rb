@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 2019_06_22_063711) do
     t.integer "domain_id", null: false
     t.string "name"
     t.string "type"
-    t.integer "ttl"
+    t.integer "ttl", default: 300
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["domain_id"], name: "index_records_on_domain_id"
