@@ -13,7 +13,7 @@
 ActiveRecord::Schema.define(version: 2019_06_22_063711) do
 
   create_table "domains", force: :cascade do |t|
-    t.string "root"
+    t.string "root", null: false
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -22,9 +22,10 @@ ActiveRecord::Schema.define(version: 2019_06_22_063711) do
 
   create_table "records", force: :cascade do |t|
     t.integer "domain_id", null: false
-    t.string "name"
-    t.string "type"
-    t.integer "ttl", default: 300
+    t.string "name", null: false
+    t.string "value", null: false
+    t.string "type", null: false
+    t.integer "ttl", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["domain_id"], name: "index_records_on_domain_id"
