@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="Rails NekoDNS: development" uuid="b250de64-52ff-4d5c-b6a7-d127c35d7189">
+    <data-source source="LOCAL" name="Rails NekoDNS: development" uuid="0294ef41-88e4-4f49-bb69-49f520d64ef0">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <imported>true</imported>

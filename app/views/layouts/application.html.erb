@@ -17,7 +17,13 @@
     <div class="container">
       <a href="<%= root_path %>" class="navbar-brand">NekoDNS</a>
 
-      <ul class="navbar-nav mr-auto"></ul>
+      <ul class="navbar-nav mr-auto">
+        <% unless session[:user_id].nil? %>
+          <li class="nav-item">
+            <a href="<%= domains_path %>" class="nav-link">My Domains</a>
+          </li>
+        <% end %>
+      </ul>
 
       <% if session[:user_id].nil? %>
         <a href="<%= login_path %>" class="btn btn-outline-dark">Login</a>

@@ -1,0 +1,5 @@
+<h1>Add a domain</h1>
+<%= bootstrap_form_tag url: 'create' do |f| %>
+  <%= f.text_field :root, placeholder: 'example.com' %>
+  <%= f.primary %>
+<% end %>

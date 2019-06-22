@@ -4,4 +4,6 @@ Rails.application.routes.draw do
   get "login", to: "login#index", as: :login
   get "auth/:provider/callback", to: "sessions#create", as: :oauth_callback
   get "logout", to: "sessions#destroy", as: :logout
+
+  resources :domains
 end
