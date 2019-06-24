@@ -1,5 +1,6 @@
 class Domain < ApplicationRecord
   belongs_to :user
+  before_create :generate_route53_create_hosted_zone_caller_reference
 
   def records
     client = Aws::Route53::Client.new
@@ -10,5 +11,11 @@ class Domain < ApplicationRecord
         Record.new(name: record_set.name, value: record.value, type: record_set.type, ttl: record_set.ttl)
       end
     end
+  end
+
+  private
+
+  def generate_route53_create_hosted_zone_caller_reference
+    self.route53_create_hosted_zone_caller_reference ||= SecureRandom.uuid
   end
 end

@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe Domain, type: :model do
+  context 'when created' do
+    subject { build(:domain) }
+
+    it 'generates a Route53 create_hosted_zone caller reference' do
+      subject.route53_create_hosted_zone_caller_reference = nil
+      subject.save
+      expect(subject.reload.route53_create_hosted_zone_caller_reference).not_to be_nil
+    end
+  end
+
   describe '.records' do
     let(:route53_client) { double(Aws::Route53::Client) }
     let(:records) { [
