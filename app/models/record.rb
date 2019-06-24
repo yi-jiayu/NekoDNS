@@ -1,0 +1,1 @@
+Record = Struct.new(:name, :value, :type, :ttl, keyword_init: true)
