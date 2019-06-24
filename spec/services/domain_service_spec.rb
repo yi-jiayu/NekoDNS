@@ -39,7 +39,20 @@ RSpec.describe DomainService do
 
     it 'sets the hosted zone ID on the domain' do
       domain = subject.create_domain(user, root)
-      expect(domain.route53_hosted_zone_id).to eq(hosted_zone_id)
+      expect(domain.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
+    end
+
+    context 'when a domain belonging to the user with the same root already exists' do
+      let!(:existing_domain) { create(:domain, user: user, root: root) }
+
+      before do
+        allow(Domain).to receive(:new).and_call_original
+      end
+
+      it 'does not create a new domain' do
+        domain = subject.create_domain(user, root)
+        expect(domain.id).to eq(existing_domain.id)
+      end
     end
   end
 end

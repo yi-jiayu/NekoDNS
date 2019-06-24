@@ -1,7 +1,7 @@
 class DomainService
   class << self
     def create_domain(user, root)
-      domain = Domain.create(user: user, root: root)
+      domain = Domain.find_or_create_by(user: user, root: root)
       response = client.create_hosted_zone(
           name: domain.root,
           caller_reference: domain.route53_create_hosted_zone_caller_reference,
