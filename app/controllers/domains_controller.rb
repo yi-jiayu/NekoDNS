@@ -14,6 +14,5 @@ class DomainsController < ApplicationController
 
   def show
     @domain = Domain.find(params[:id])
-    flash.notice = 'Please wait, we are currently preparing the name servers for your domain.' unless @domain.ready?
   end
 end

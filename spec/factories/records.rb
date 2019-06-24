@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :record do
     name { 'example.com.' }
+
     trait :soa do
       value { 'sns.dns.icann.org. noc.dns.icann.org. 2019041044 7200 3600 1209600 3600' }
       type { 'SOA' }
