@@ -1,5 +1,19 @@
 <h1>Account</h1>
 <div>
+  <h2>Details</h2>
   <span class="font-weight-bold">Name:</span>
-  <span><%= session[:name] %></span>
+  <span><%= current_user.name %></span>
+</div>
+<div>
+  <h2>Integrations</h2>
+  <section>
+    <h3>Telegram</h3>
+    <% if current_user.telegram_user_id.nil? %>
+      <p>Use this button to start a Telegram chat with @nekodnsbot on Telegram, then press the Start button.</p>
+      <a href="<%= link_telegram_account_path %>" target="_blank"
+         class="btn btn-outline-primary">Link Telegram account</a>
+    <% else %>
+      <button class="btn btn-outline-primary" disabled>Telegram account linked!</button>
+    <% end %>
+  </section>
 </div>

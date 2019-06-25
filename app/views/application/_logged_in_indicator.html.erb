@@ -1,6 +1,6 @@
 <ul class="navbar-nav">
   <li class="nav-item">
-    <a href="<%= account_path %>" class="nav-link text-dark"><%= session[:name] %></a>
+    <a href="<%= account_path %>" class="nav-link text-dark"><%= current_user.name %></a>
   </li>
   <li class="nav-item">
     <a href="<%= logout_path %>" class="nav-link">Logout</a>
