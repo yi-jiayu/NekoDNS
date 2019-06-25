@@ -8,6 +8,22 @@ RSpec.describe AccountController, type: :controller do
   end
 
   describe 'GET #link_telegram_account' do
+    let(:token) { create(:telegram_link_token, user: user) }
+
+    before do
+      allow(TelegramService).to receive(:create_link_token).and_return(token)
+    end
+
+    it 'calls the TelegramService to create a link token' do
+      expect(TelegramService).to receive(:create_link_token).with(user)
+      get :link_telegram_account
+    end
+
+    it 'redirects to a Telegram deep link' do
+      get :link_telegram_account
+      expect(response).to redirect_to("https://t.me/?start=#{token.value}")
+    end
+
     context 'when the current user already has a Telegram user ID' do
       let(:user) { create(:user, :with_telegram_user_id) }
 
