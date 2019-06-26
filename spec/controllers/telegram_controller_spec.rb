@@ -37,6 +37,15 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
           expect(subject).to render_template(:send_message)
         end
       end
+
+      context 'when the telegram_user_id is not linked to a user' do
+        let(:params) { text_message(text: '/listdomains', from_id: nil, chat_id: telegram_user_id) }
+
+        it 'returns no content' do
+          post :create, params: params
+          expect(response).to have_http_status(:no_content)
+        end
+      end
     end
   end
 end

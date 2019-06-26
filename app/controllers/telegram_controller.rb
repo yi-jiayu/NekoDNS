@@ -9,6 +9,8 @@ class TelegramController < ApplicationController
     when 'start'
       TelegramService.instance.link_telegram_account(args, telegram_user_id)
     when 'listdomains'
+      return unless current_user
+
       @domains = current_user.domains
       @chat_id = chat_id
       render :send_message
