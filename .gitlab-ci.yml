@@ -17,4 +17,19 @@ before_script:
 
 rspec:
   script:
-    - rspec spec
+    - rake spec
+  artifacts:
+    paths:
+      - coverage/
+
+pages:
+  stage: deploy
+  dependencies:
+    - rspec
+  script:
+    - mv coverage/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
