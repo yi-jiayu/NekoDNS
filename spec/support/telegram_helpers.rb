@@ -5,6 +5,9 @@ def text_message(params)
       from: {
         id: params[:from_id],
       },
+      chat: {
+        id: params[:chat_id],
+      },
     },
   }
 end

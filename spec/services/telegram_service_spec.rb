@@ -3,8 +3,9 @@ require 'rails_helper'
 RSpec.describe TelegramService do
   subject { TelegramService.instance }
 
+  let(:user) { create(:user) }
+
   describe '#create_link_token' do
-    let(:user) { create(:user) }
 
     it 'creates a new link token with a value for a user' do
       subject.create_link_token(user)
@@ -29,7 +30,6 @@ RSpec.describe TelegramService do
   end
 
   describe '#link_telegram_account' do
-    let(:user) { create(:user) }
     let(:token_value) { SecureRandom.uuid }
     let(:telegram_user_id) { 123 }
 

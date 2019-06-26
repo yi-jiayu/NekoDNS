@@ -8,9 +8,11 @@ class TelegramController < ApplicationController
     case command
     when 'start'
       TelegramService.instance.link_telegram_account(args, telegram_user_id)
+    when 'listdomains'
+      @domains = current_user.domains
+      @chat_id = chat_id
+      render :send_message
     end
-  ensure
-    head :ok
   end
 
   private
@@ -27,10 +29,18 @@ class TelegramController < ApplicationController
     update_params.dig(:message, :from, :id)&.to_i
   end
 
+  def chat_id
+    update_params.dig(:message, :chat, :id)&.to_i
+  end
+
   def command_and_args
     match = /\/(\w+)@?\w* ?(.*)/.match(message_text)
     return if match.nil?
 
     [match[1], match[2]]
+  end
+
+  def current_user
+    User.find_by(telegram_user_id: telegram_user_id)
   end
 end
