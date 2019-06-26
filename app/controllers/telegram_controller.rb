@@ -3,7 +3,7 @@ class TelegramController < ApplicationController
   skip_before_action :require_login
   wrap_parameters format: []
 
-  def webhook
+  def create
     match = /\/(\w+)@?\w* ?(.*)/.match(message_text)
     return if match.nil?
 
