@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe DomainService do
-  subject { DomainService }
+  subject { DomainService.instance }
 
   let(:route53_client) { double(Aws::Route53::Client) }
   let(:hosted_zone_id) { 'hosted zone ID' }
 
   before do
-    allow(DomainService).to receive(:client).and_return(route53_client)
+    allow(DomainService.instance).to receive(:client).and_return(route53_client)
   end
 
   describe '.create_domain' do

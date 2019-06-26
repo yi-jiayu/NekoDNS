@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TelegramService do
-  subject { TelegramService }
+  subject { TelegramService.instance }
 
   describe '.create_link_token' do
     let(:user) { create(:user) }
