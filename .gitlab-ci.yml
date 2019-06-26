@@ -12,6 +12,7 @@ cache:
 # services such as redis or postgres
 before_script:
   - ruby -v  # Print out ruby version for debugging
+  - gem install bundler:2.0.2
   - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
 
 rspec:
