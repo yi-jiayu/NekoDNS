@@ -4,17 +4,10 @@ class TelegramController < ApplicationController
   wrap_parameters format: []
 
   def create
-    match = /\/(\w+)@?\w* ?(.*)/.match(message_text)
-    return if match.nil?
-
-    command, args = match[1], match[2]
-    puts "command: #{command}, args: #{args}"
-    return unless command == 'start'
-
-    token = TelegramLinkToken.find_by(value: args)
-    unless token.nil?
-      token.user.update(telegram_user_id: telegram_user_id)
-      token.delete
+    command, args = command_and_args
+    case command
+    when 'start'
+      TelegramService.instance.link_telegram_account(args, telegram_user_id)
     end
   ensure
     head :ok
@@ -22,15 +15,22 @@ class TelegramController < ApplicationController
 
   private
 
-  def webhook_params
-    params.permit(:update_id, message: [:text, {from: [:id, :first_name], chat: :id}])
+  def update_params
+    params.permit(:update_id, message: [:text, { from: [:id, :first_name], chat: :id }])
   end
 
   def message_text
-    webhook_params.dig(:message, :text)
+    update_params.dig(:message, :text)
   end
 
   def telegram_user_id
-    webhook_params.dig(:message, :from, :id)
+    update_params.dig(:message, :from, :id)&.to_i
+  end
+
+  def command_and_args
+    match = /\/(\w+)@?\w* ?(.*)/.match(message_text)
+    return if match.nil?
+
+    [match[1], match[2]]
   end
 end
