@@ -17,9 +17,3 @@ before_script:
 rspec:
   script:
     - rspec spec
-
-rails:
-  script:
-    - rails db:migrate
-    - rails db:seed
-    - rails test
