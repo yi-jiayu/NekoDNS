@@ -9,12 +9,16 @@ class TelegramController < ApplicationController
     when 'start'
       TelegramService.instance.link_telegram_account(args, telegram_user_id)
     when 'listdomains'
-      return unless current_user
-
-      @domains = current_user.domains
-      @chat_id = chat_id
-      render :list_domains
+      list_domains
     end
+  end
+
+  def list_domains
+    return unless current_user
+
+    @domains = current_user.domains
+    @chat_id = chat_id
+    render :list_domains
   end
 
   private
@@ -43,6 +47,6 @@ class TelegramController < ApplicationController
   end
 
   def current_user
-    User.find_by(telegram_user_id: telegram_user_id)
+    @current_user ||= User.find_by(telegram_user_id: telegram_user_id)
   end
 end
