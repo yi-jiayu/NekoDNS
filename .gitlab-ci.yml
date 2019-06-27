@@ -23,15 +23,3 @@ rspec:
   artifacts:
     paths:
       - coverage/
-
-pages:
-  stage: deploy
-  dependencies:
-    - rspec
-  script:
-    - mv coverage/ public/
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
