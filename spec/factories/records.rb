@@ -1,6 +1,9 @@
 FactoryBot.define do
   factory :record do
-    name { 'example.com.' }
+    name { Faker::Internet.domain_name + '.' }
+    value { Faker::Internet.ip_v4_address }
+    type { 'A' }
+    ttl { 300 }
 
     trait :soa do
       value { 'sns.dns.icann.org. noc.dns.icann.org. 2019041044 7200 3600 1209600 3600' }
