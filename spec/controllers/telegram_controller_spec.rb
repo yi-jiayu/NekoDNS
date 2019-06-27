@@ -30,11 +30,11 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
         let(:domains) { create_list(:domain, 2, user: user) }
         let(:params) { text_message(text: '/listdomains', from_id: telegram_user_id, chat_id: telegram_user_id) }
 
-        it 'renders a Telegram bot API sendMessage request' do
+        it 'renders the list domains view' do
           post :create, params: params
           expect(assigns(:chat_id)).to eq(telegram_user_id)
           expect(assigns(:domains)).to eq(domains)
-          expect(subject).to render_template(:send_message)
+          expect(subject).to render_template(:list_domains)
         end
       end
 

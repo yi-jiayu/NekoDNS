@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'telegram/send_message', type: :view do
+RSpec.describe 'telegram/list_domains', type: :view do
   let(:chat_id) { 123 }
   let(:domains) { build_list(:domain, 2) }
   let(:formatted_domains) { 'formatted domains' }

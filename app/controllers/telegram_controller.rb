@@ -13,7 +13,7 @@ class TelegramController < ApplicationController
 
       @domains = current_user.domains
       @chat_id = chat_id
-      render :send_message
+      render :list_domains
     end
   end
 
