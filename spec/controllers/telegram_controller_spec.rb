@@ -23,28 +23,28 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
         post :create, params: params
       end
     end
+  end
 
-    context 'list domains command' do
-      context 'when the telegram_user_id is linked to a user' do
-        let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
-        let(:domains) { create_list(:domain, 2, user: user) }
-        let(:params) { text_message(text: '/listdomains', from_id: telegram_user_id, chat_id: telegram_user_id) }
+  context 'list domains command' do
+    context 'when the telegram_user_id is linked to a user' do
+      let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
+      let(:domains) { create_list(:domain, 2, user: user) }
+      let(:params) { text_message(text: '/listdomains', from_id: telegram_user_id, chat_id: telegram_user_id) }
 
-        it 'renders the list domains view' do
-          post :create, params: params
-          expect(assigns(:chat_id)).to eq(telegram_user_id)
-          expect(assigns(:domains)).to eq(domains)
-          expect(subject).to render_template(:list_domains)
-        end
+      it 'renders the list domains view' do
+        post :create, params: params
+        expect(assigns(:chat_id)).to eq(telegram_user_id)
+        expect(assigns(:domains)).to eq(domains)
+        expect(subject).to render_template(:list_domains)
       end
+    end
 
-      context 'when the telegram_user_id is not linked to a user' do
-        let(:params) { text_message(text: '/listdomains', from_id: nil, chat_id: telegram_user_id) }
+    context 'when the telegram_user_id is not linked to a user' do
+      let(:params) { text_message(text: '/listdomains', from_id: nil, chat_id: telegram_user_id) }
 
-        it 'returns no content' do
-          post :create, params: params
-          expect(response).to have_http_status(:no_content)
-        end
+      it 'returns no content' do
+        post :create, params: params
+        expect(response).to have_http_status(:no_content)
       end
     end
   end
@@ -65,6 +65,42 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
     context 'when the telegram_user_id is not linked to a user' do
       let(:params) { text_message(text: '/listrecords', from_id: nil, chat_id: telegram_user_id) }
+
+      it 'returns no content' do
+        post :create, params: params
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+  end
+
+  context 'set record command' do
+    context 'when the telegram_user_id is linked to a user' do
+      let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
+      let(:domain) { create(:domain, user: user) }
+      let(:record) { build(:record) }
+      let(:text) { "/setrecord #{domain.root} #{record.type} #{record.name} #{record.value} #{record.ttl}" }
+      let(:params) { text_message(text: text, from_id: telegram_user_id, chat_id: telegram_user_id) }
+
+      before do
+        allow(DomainService.instance).to receive(:set_record)
+      end
+
+      it 'calls DomainService#set_record' do
+        expect(DomainService.instance).to receive(:set_record).with(domain, record)
+        post :create, params: params
+      end
+
+      it 'renders the set record view' do
+        post :create, params: params
+        expect(assigns(:chat_id)).to eq(telegram_user_id)
+        expect(assigns(:domain)).to eq(domain)
+        expect(assigns(:record)).to eq(record)
+        expect(subject).to render_template(:set_record)
+      end
+    end
+
+    context 'when the telegram_user_id is not linked to a user' do
+      let(:params) { text_message(text: '/setrecord', from_id: nil, chat_id: telegram_user_id) }
 
       it 'returns no content' do
         post :create, params: params

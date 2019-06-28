@@ -15,6 +15,8 @@ class TelegramController < ApplicationController
       continue_in :list_domains
     when 'listrecords'
       continue_in :list_records
+    when 'setrecord'
+      continue_in :set_record
     end
   end
 
@@ -29,6 +31,13 @@ class TelegramController < ApplicationController
   def list_records
     root = args.split.first
     @domain = Domain.find_by(root: root, user: current_user)
+  end
+
+  def set_record
+    root, type, name, value, ttl = args.split
+    @domain = Domain.find_by(root: root, user: current_user)
+    @record = Record.new(type: type, name: name, value: value, ttl: ttl.to_i)
+    DomainService.instance.set_record(@domain, @record)
   end
 
   private
