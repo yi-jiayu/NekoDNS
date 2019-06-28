@@ -1,4 +1,7 @@
 <h1><%= @domain.root %></h1>
+
+<%= link_to 'Delete domain', delete_domain_path(@domain), class: 'btn btn-danger' %>
+
 <h2>Records</h2>
 
 <table class="table">

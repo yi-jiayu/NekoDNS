@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe DomainsController, type: :controller do
   let(:user) { create(:user) }
+  let(:domain) { create(:domain, user: user) }
+  let(:id) { domain.id }
 
   before do
     login_as(user)
   end
 
   describe '#destroy' do
-    let(:domain) { create(:domain, user: user) }
-    let(:id) { domain.id }
 
     before do
       allow(DomainService.instance).to receive(:delete_domain).and_return(true)
@@ -72,7 +72,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { id: id }
-        expect(flash.alert).to eq("Can't delete a domain that doesn't exist!")
+        expect(flash.alert).to eq("Domain not found!")
       end
 
       it 'redirects to the domains list' do
@@ -86,13 +86,20 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { id: id }
-        expect(flash.alert).to eq("Can't delete a domain that doesn't exist!")
+        expect(flash.alert).to eq("Domain not found!")
       end
 
       it 'redirects to the domain list' do
         delete :destroy, params: { id: id }
         expect(response).to redirect_to(domains_path)
       end
+    end
+  end
+
+  describe '#delete' do
+    it 'renders the delete confirmation page' do
+      get :delete, params: { id: id }
+      expect(response).to render_template(:delete)
     end
   end
 end

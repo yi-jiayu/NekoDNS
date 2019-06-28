@@ -10,5 +10,7 @@ Rails.application.routes.draw do
   get 'account/integrations/telegram', to: 'account#link_telegram_account', as: :link_telegram_account
   get "auth/:provider/callback", to: "sessions#create", as: :oauth_callback
 
-  resources :domains
+  resources :domains do
+    get 'delete', on: :member
+  end
 end
