@@ -112,6 +112,41 @@ RSpec.describe DomainService do
     end
   end
 
+  describe '#set_record' do
+    let(:hosted_zone_id) { 'Z3M3LMPEXAMPLE' }
+    let(:domain) { create(:domain, route53_hosted_zone_id: hosted_zone_id) }
+    let(:record) { build(:record, name: 'example.com', value: '192.0.2.44', ttl: 60, type: 'A') }
+
+    before do
+      allow(route53_client).to receive(:change_resource_record_sets)
+    end
+
+    it 'calls Aws::Route53::Client#change_resource_record_sets' do
+      params = {
+        change_batch: {
+          changes: [
+            {
+              action: "CREATE",
+              resource_record_set: {
+                name: "example.com",
+                resource_records: [
+                  {
+                    value: "192.0.2.44",
+                  },
+                ],
+                ttl: 60,
+                type: "A",
+              },
+            },
+          ],
+          comment: "Record set created for #{domain.user} #{domain.user.id} by NekoDNS",
+        },
+        hosted_zone_id: "Z3M3LMPEXAMPLE",
+      }
+      expect(route53_client).to receive(:change_resource_record_sets).with(params)
+      subject.set_record(domain, record)
+    end
+  end
 end
 
 def create_hosted_zone_response(hosted_zone_id)

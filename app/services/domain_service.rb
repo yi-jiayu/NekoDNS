@@ -32,6 +32,24 @@ class DomainService
     raise Errors::DomainNotEmpty.new
   end
 
+  def set_record(domain, record)
+    params = {
+      change_batch: {
+        changes: [{
+                    action: 'CREATE',
+                    resource_record_set: {
+                      name: record.name,
+                      resource_records: [{ value: record.value }],
+                      ttl: record.ttl,
+                      type: record.type,
+                    } }],
+        comment: "Record set created for #{domain.user} #{domain.user.id} by NekoDNS",
+      },
+      hosted_zone_id: domain.route53_hosted_zone_id,
+    }
+    client.change_resource_record_sets(params)
+  end
+
   module Errors
     class DomainNotEmpty < StandardError
       def message
