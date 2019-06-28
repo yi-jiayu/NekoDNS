@@ -5,11 +5,11 @@ class DomainService
     root = root + '.' unless fully_qualified(root)
     domain = Domain.find_or_create_by(user: user, root: root)
     response = client.create_hosted_zone(
-        name: domain.root,
-        caller_reference: domain.route53_create_hosted_zone_caller_reference,
-        hosted_zone_config: {
-            comment: comment_for(domain),
-        },
+      name: domain.root,
+      caller_reference: domain.route53_create_hosted_zone_caller_reference,
+      hosted_zone_config: {
+        comment: comment_for(domain),
+      },
     )
     domain.update(route53_hosted_zone_id: response.hosted_zone.id)
     domain
@@ -21,6 +21,21 @@ class DomainService
     record_sets.flat_map do |record_set|
       record_set.resource_records.map do |record|
         Record.new(name: record_set.name, value: record.value, type: record_set.type, ttl: record_set.ttl)
+      end
+    end
+  end
+
+  def delete_domain(domain)
+    client.delete_hosted_zone(id: domain.route53_hosted_zone_id)
+    domain.destroy
+  rescue Aws::Route53::Errors::HostedZoneNotEmpty
+    raise Errors::DomainNotEmpty.new
+  end
+
+  module Errors
+    class DomainNotEmpty < StandardError
+      def message
+        'Domain not empty'
       end
     end
   end

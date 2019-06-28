@@ -10,7 +10,7 @@ RSpec.describe DomainService do
     allow(DomainService.instance).to receive(:client).and_return(route53_client)
   end
 
-  describe '.create_domain' do
+  describe '#create_domain' do
     let(:user) { create(:user) }
     let(:root) { 'example.com.' }
     let(:domain) { create(:domain, user: user) }
@@ -56,8 +56,7 @@ RSpec.describe DomainService do
     end
   end
 
-  describe '.list_records' do
-    let(:hosted_zone_id) { 'hosted zone ID' }
+  describe '#list_records' do
     let(:records) { [
       build(:record, :soa),
       build(:record, :ns),
@@ -74,6 +73,42 @@ RSpec.describe DomainService do
 
     it 'returns a list of records' do
       expect(subject.list_records(hosted_zone_id)).to eq(records)
+    end
+  end
+
+  describe '#delete_domain' do
+    let(:domain) { create(:domain, route53_hosted_zone_id: hosted_zone_id) }
+
+    before do
+      allow(route53_client).to receive(:delete_hosted_zone)
+    end
+
+    it 'calls Aws::Route53::Client#delete_hosted_zone' do
+      expect(route53_client).to receive(:delete_hosted_zone).with(id: hosted_zone_id)
+      subject.delete_domain(domain)
+    end
+
+    it 'deletes the domain' do
+      subject.delete_domain(domain)
+      expect(Domain.exists?(id: domain.id)).to be false
+    end
+
+    context 'when the client raises Aws::Route53::Types::HostedZoneNotEmpty' do
+      before do
+        allow(route53_client).to receive(:delete_hosted_zone).and_raise(Aws::Route53::Errors::HostedZoneNotEmpty.new(nil, 'The specified hosted zone contains non-required resource record sets  and so cannot be deleted'))
+      end
+
+      it 're-raises DomainService::DomainNotEmpty' do
+        expect { subject.delete_domain(domain) }.to raise_error(DomainService::Errors::DomainNotEmpty)
+      end
+
+      it 'does not delete the domain' do
+        begin
+          subject.delete_domain(domain)
+        rescue
+          expect(Domain.exists?(id: domain.id)).to be true
+        end
+      end
     end
   end
 
