@@ -1,24 +1,18 @@
-# README
+# NekoDNS
+Chatops for your DNS records
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Features
 
-Things you may want to cover:
+Tired of having to navigate through your domain registar's clunky web interface
+every time you need to add a new DNS record?
 
-* Ruby version
+Configure your domain to use NekoDNS-provided name servers (hosted on [AWS Route
+53](https://aws.amazon.com/route53/)) and never struggle with that again!
 
-* System dependencies
+NekoDNS integrates with your favourite instant messaging platforms, giving you
+the convenience of managing your DNS records anytime and anywhere, without
+requiring a full-sized web browser.
 
-* Configuration
+## Supported platforms
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- [Telegram](https://telegram.org/)
