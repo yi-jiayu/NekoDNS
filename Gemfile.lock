@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/yi-jiayu/codecov-ruby.git
+  revision: 0917fae9d9b9591d98038417a72adb3f50f5f751
+  specs:
+    codecov (0.1.14)
+      json
+      simplecov
+      url
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -94,10 +103,6 @@ GEM
       xpath (~> 3.2)
     childprocess (1.0.1)
       rake (< 13.0)
-    codecov (0.1.14)
-      json
-      simplecov
-      url
     concurrent-ruby (1.1.5)
     crass (1.0.4)
     diff-lcs (1.3)
@@ -327,7 +332,7 @@ DEPENDENCIES
   bootstrap_form (>= 4.2.0)
   byebug
   capybara (>= 2.15)
-  codecov
+  codecov!
   factory_bot_rails
   faker
   jbuilder (~> 2.5)

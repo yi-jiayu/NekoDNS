@@ -20,6 +20,3 @@ before_script:
 rspec:
   script:
     - rake spec
-  artifacts:
-    paths:
-      - coverage/
