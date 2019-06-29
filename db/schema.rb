@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_25_135038) do
+ActiveRecord::Schema.define(version: 2019_06_29_180507) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "domains", force: :cascade do |t|
     t.string "root", null: false
@@ -19,6 +22,7 @@ ActiveRecord::Schema.define(version: 2019_06_25_135038) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "route53_create_hosted_zone_caller_reference"
     t.string "route53_hosted_zone_id"
+    t.index ["root", "user_id"], name: "index_domains_on_root_and_user_id"
     t.index ["user_id"], name: "index_domains_on_user_id"
   end
 

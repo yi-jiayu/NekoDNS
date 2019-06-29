@@ -38,7 +38,7 @@ class DomainsController < ApplicationController
   private
 
   def set_current_domain
-    @domain = Domain.find_by(id: params[:id], user: current_user)
+    @domain = Domain.find_by(root: params[:root], user: current_user)
     if @domain.nil?
       flash.alert = 'Domain not found!'
       redirect_to(domains_path)

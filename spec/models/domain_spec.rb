@@ -1,6 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Domain, type: :model do
+  describe '#to_param' do
+    let(:domain) { build(:domain) }
+
+    it 'is linked to by root' do
+      expect(domain_path(domain)).to include(domain.root)
+    end
+  end
+
   context 'when created' do
     subject { build(:domain) }
 

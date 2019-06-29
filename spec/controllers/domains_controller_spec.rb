@@ -3,30 +3,29 @@ require 'rails_helper'
 RSpec.describe DomainsController, type: :controller do
   let(:user) { create(:user) }
   let(:domain) { create(:domain, user: user) }
-  let(:id) { domain.id }
+  let(:root) { domain.root }
 
   before do
     login_as(user)
   end
 
   describe '#destroy' do
-
     before do
       allow(DomainService.instance).to receive(:delete_domain).and_return(true)
     end
 
     it 'calls DomainService#delete_domain' do
       expect(DomainService.instance).to receive(:delete_domain).with(domain)
-      delete :destroy, params: { id: id }
+      delete :destroy, params: { root: root }
     end
 
     it 'flashes a notice that the domain was deleted' do
-      delete :destroy, params: { id: id }
+      delete :destroy, params: { root: root }
       expect(flash.notice).to eq('Domain deleted!')
     end
 
     it 'redirects to the domains list' do
-      delete :destroy, params: { id: id }
+      delete :destroy, params: { root: root }
       expect(response).to redirect_to(domains_path)
     end
 
@@ -36,12 +35,12 @@ RSpec.describe DomainsController, type: :controller do
       end
 
       it 'flashes an alert with the reason' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(flash.alert).to eq('Your domain could not be deleted because it contains records other than the default SOA and NS records.')
       end
 
       it 'redirects to the domain page' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(response).to redirect_to(domain)
       end
     end
@@ -52,12 +51,12 @@ RSpec.describe DomainsController, type: :controller do
       end
 
       it 'flashes an alert' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(flash.alert).to eq('An unknown error occurred while trying to delete your domain.')
       end
 
       it 'redirects to the domain page' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(response).to redirect_to(domain)
       end
     end
@@ -67,30 +66,30 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'does not call DomainService#delete_domain' do
         expect(DomainService.instance).not_to receive(:delete_domain)
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
       end
 
       it 'flashes an error message' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(flash.alert).to eq("Domain not found!")
       end
 
       it 'redirects to the domains list' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(response).to redirect_to(domains_path)
       end
     end
 
     context 'when the domain does not exist' do
-      let(:id) { -1 }
+      let(:root) { '.' }
 
       it 'flashes an error message' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(flash.alert).to eq("Domain not found!")
       end
 
       it 'redirects to the domain list' do
-        delete :destroy, params: { id: id }
+        delete :destroy, params: { root: root }
         expect(response).to redirect_to(domains_path)
       end
     end
@@ -98,7 +97,7 @@ RSpec.describe DomainsController, type: :controller do
 
   describe '#delete' do
     it 'renders the delete confirmation page' do
-      get :delete, params: { id: id }
+      get :delete, params: { root: root }
       expect(response).to render_template(:delete)
     end
   end
