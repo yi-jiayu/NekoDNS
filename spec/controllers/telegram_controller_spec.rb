@@ -118,6 +118,18 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`))
           expect(response).to render_template(:flash)
         end
       end
+
+      context 'when DomainService#set_record raises DomainService::Errors::RecordInvalid' do
+        before do
+          allow(DomainService.instance).to receive(:set_record).and_raise(DomainService::Errors::RecordInvalid)
+        end
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('The record you specified was invalid!')
+          expect(response).to render_template(:flash)
+        end
+      end
     end
 
     context 'when the telegram_user_id is not linked to a user' do
