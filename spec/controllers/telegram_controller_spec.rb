@@ -97,6 +97,27 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
         expect(assigns(:record)).to eq(record)
         expect(subject).to render_template(:set_record)
       end
+
+      context 'when not enough arguments are given' do
+        let(:text) { '/setrecord' }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq(%q(Usage: /setrecord domain type name value TTL
+Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`))
+          expect(response).to render_template(:flash)
+        end
+      end
+
+      context 'when the domain is not found' do
+        let(:text) { "/setrecord no_such_domain #{record.type} #{record.name} #{record.value} #{record.ttl}" }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('Domain not found!')
+          expect(response).to render_template(:flash)
+        end
+      end
     end
 
     context 'when the telegram_user_id is not linked to a user' do

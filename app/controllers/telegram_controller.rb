@@ -34,8 +34,18 @@ class TelegramController < ApplicationController
   end
 
   def set_record
-    root, type, name, value, ttl = args.split
+    params = args.split
+    if params.length < 5
+      flash.alert = %q(Usage: /setrecord domain type name value TTL
+Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
+      return render :flash
+    end
+    root, type, name, value, ttl = params
     @domain = Domain.find_by(root: root, user: current_user)
+    unless @domain
+      flash.alert = 'Domain not found!'
+      return render :flash
+    end
     @record = Record.new(type: type, name: name, value: value, ttl: ttl.to_i)
     DomainService.instance.set_record(@domain, @record)
   end

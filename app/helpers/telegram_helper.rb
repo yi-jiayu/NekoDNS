@@ -17,4 +17,8 @@ module TelegramHelper
       *TTL:* #{record.ttl}
     TEXT
   end
+
+  def show_flash
+    [flash.alert, flash.notice].compact.join("\n")
+  end
 end
