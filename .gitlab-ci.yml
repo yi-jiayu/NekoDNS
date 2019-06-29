@@ -29,3 +29,14 @@ before_script:
 rspec:
   script:
     - rake spec
+
+staging:
+  stage: deploy
+  before_script:
+    - gem install dpl
+    - curl https://cli-assets.heroku.com/install.sh | sh
+  script:
+    - dpl --provider=heroku --app=nekodns-staging --api-key=$HEROKU_API_KEY
+    - heroku run --app=nekodns-staging --exit-code rake db:migrate
+  only:
+    - master
