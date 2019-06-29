@@ -24,17 +24,17 @@
       </a>
 
       <ul class="navbar-nav mr-auto">
-        <% unless session[:user_id].nil? %>
+        <% if current_user %>
           <li class="nav-item">
             <a href="<%= domains_path %>" class="nav-link">My Domains</a>
           </li>
         <% end %>
       </ul>
 
-      <% if session[:user_id].nil? %>
-        <a href="<%= login_path %>" class="btn btn-outline-dark">Login</a>
-      <% else %>
+      <% if current_user %>
         <%= render 'logged_in_indicator' %>
+      <% else %>
+        <a href="<%= login_path %>" class="btn btn-outline-dark">Login</a>
       <% end %>
     </div>
   </nav>
