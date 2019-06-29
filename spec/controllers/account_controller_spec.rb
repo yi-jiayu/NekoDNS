@@ -29,7 +29,7 @@ RSpec.describe AccountController, type: :controller do
 
       it 'redirects back to the account page' do
         get :link_telegram_account
-        expect(response).to redirect_to(account_path)
+        expect(response).to redirect_to(account_index_path)
       end
     end
   end
