@@ -365,6 +365,7 @@ DEPENDENCIES
   rails (~> 6.0.0.rc1)
   rails-controller-testing
   rspec-rails (~> 4.pre.0.pre.dev)
+  rubocop
   rubocop-rails
   rubocop-rspec
   sass-rails (~> 5)
