@@ -30,6 +30,7 @@ rspec:
 
 staging:
   stage: deploy
+  cache: {}
   before_script:
     - gem install dpl
     - curl https://cli-assets.heroku.com/install.sh | sh
