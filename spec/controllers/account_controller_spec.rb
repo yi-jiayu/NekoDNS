@@ -21,7 +21,7 @@ RSpec.describe AccountController, type: :controller do
 
     it 'redirects to a Telegram deep link' do
       get :link_telegram_account
-      expect(response).to redirect_to("https://t.me/?start=#{token.value}")
+      expect(response).to redirect_to("https://t.me/#{Rails.configuration.x.telegram.bot_username}?start=#{token.value}")
     end
 
     context 'when the current user already has a Telegram user ID' do

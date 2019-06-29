@@ -12,6 +12,6 @@ class AccountController < ApplicationController
   private
 
   def telegram_deep_link(payload)
-    "https://t.me/#{Rails.application.secrets.telegram_bot_username}?start=#{payload}"
+    "https://t.me/#{Rails.configuration.x.telegram.bot_username}?start=#{payload}"
   end
 end

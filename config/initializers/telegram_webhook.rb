@@ -8,7 +8,7 @@ if Rails.env.development? && defined?(Rails::Server)
         puts "initializers/telegram_webhook.rb: config.ngrok_host detected: #{ngrok_host}"
         webhook_url = URI::HTTPS.build(host: ngrok_host, path: '/telegram/updates').to_s
         puts "initializers/telegram_webhook.rb: setting Telegram bot webhook URL to #{webhook_url}"
-        set_webhook_endpoint = URI::HTTPS.build(host: 'api.telegram.org', path: "/bot#{Rails.application.secrets.telegram_bot_token}/setWebhook")
+        set_webhook_endpoint = URI::HTTPS.build(host: 'api.telegram.org', path: "/bot#{Rails.configuration.x.telegram.bot_token}/setWebhook")
         res = Net::HTTP.post_form(set_webhook_endpoint, 'url' => webhook_url)
         puts "initializers/telegram_webhook.rb: #{res.body}"
       end

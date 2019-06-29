@@ -31,6 +31,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'aws-sdk-route53'
 gem 'bootstrap', '~> 4.3.1'
 gem "bootstrap_form", ">= 4.2.0"
+gem 'figaro'
 gem 'omniauth-github'
 
 group :development, :test do
