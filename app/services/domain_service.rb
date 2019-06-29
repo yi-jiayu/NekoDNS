@@ -2,7 +2,6 @@ class DomainService
   include Singleton
 
   def create_domain(user, root)
-    root = root + '.' unless fully_qualified(root)
     domain = Domain.find_or_create_by(user: user, root: root)
     response = client.create_hosted_zone(
       name: domain.root,
@@ -74,9 +73,5 @@ class DomainService
 
   def comment_for(domain)
     "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS"
-  end
-
-  def fully_qualified(root)
-    root[-1] == '.'
   end
 end

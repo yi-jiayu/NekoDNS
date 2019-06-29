@@ -12,7 +12,7 @@ RSpec.describe DomainService do
 
   describe '#create_domain' do
     let(:user) { create(:user) }
-    let(:root) { 'example.com.' }
+    let(:root) { 'example.com' }
     let(:domain) { create(:domain, user: user) }
 
     before do

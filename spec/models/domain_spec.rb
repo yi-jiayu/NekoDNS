@@ -20,4 +20,12 @@ RSpec.describe Domain, type: :model do
       expect(domain.records).to eq(records)
     end
   end
+
+  context 'before save' do
+    let(:domain) { build(:domain, root: 'example.com.') }
+    it 'removes trailing dots from the domain root' do
+      domain.save
+      expect(domain.reload.root).to eq('example.com')
+    end
+  end
 end
