@@ -48,12 +48,20 @@ class DomainService
       hosted_zone_id: domain.route53_hosted_zone_id,
     }
     client.change_resource_record_sets(params)
+  rescue Aws::Route53::Errors::InvalidInput, Aws::Route53::Errors::InvalidChangeBatch
+    raise Errors::RecordInvalid.new
   end
 
   module Errors
     class DomainNotEmpty < StandardError
       def message
         'Domain not empty'
+      end
+    end
+
+    class RecordInvalid < StandardError
+      def message
+        'Record invalid'
       end
     end
   end

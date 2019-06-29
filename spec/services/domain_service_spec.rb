@@ -146,6 +146,26 @@ RSpec.describe DomainService do
       expect(route53_client).to receive(:change_resource_record_sets).with(params)
       subject.set_record(domain, record)
     end
+
+    context 'when the client raises Aws::Route53::Errors::InvalidChangeBatch' do
+      before do
+        allow(route53_client).to receive(:change_resource_record_sets).and_raise(Aws::Route53::Errors::InvalidChangeBatch.new(nil, "[RRSet with DNS name example.com. is not permitted in zone example.com.]"))
+      end
+
+      it 're-raises DomainService::Errors::RecordInvalid' do
+        expect { subject.set_record(domain, record) }.to raise_error(DomainService::Errors::RecordInvalid)
+      end
+    end
+
+    context 'when the client raises Aws::Route53::Errors::InvalidInput' do
+      before do
+        allow(route53_client).to receive(:change_resource_record_sets).and_raise(Aws::Route53::Errors::InvalidInput.new(nil, "1 validation error detected: Value '-1' at 'changeBatch.changes.1.member.resourceRecordSet.tTL' failed to satisfy constraint: Member must have value greater than or equal to 0"))
+      end
+
+      it 're-raises DomainService::Errors::RecordInvalid' do
+        expect { subject.set_record(domain, record) }.to raise_error(DomainService::Errors::RecordInvalid)
+      end
+    end
   end
 end
 
