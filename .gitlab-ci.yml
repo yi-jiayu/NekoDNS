@@ -3,15 +3,6 @@
 # https://hub.docker.com/r/library/ruby/tags/
 image: "ruby:2.6.3"
 
-services:
-  - postgres:latest
-
-variables:
-  POSTGRES_DB: NekoDNS_test
-  POSTGRES_USER: NekoDNS
-  POSTGRES_PASSWORD: ''
-  DB_HOST: 'postgres'
-
 # Cache gems in between builds
 cache:
   paths:
@@ -27,6 +18,13 @@ before_script:
   - bundle install -j $(nproc) --path vendor  # Install dependencies into ./vendor/ruby
 
 rspec:
+  services:
+    - postgres:latest
+  variables:
+    POSTGRES_DB: NekoDNS_test
+    POSTGRES_USER: NekoDNS
+    POSTGRES_PASSWORD: ''
+    DB_HOST: 'postgres'
   script:
     - rake spec
 
