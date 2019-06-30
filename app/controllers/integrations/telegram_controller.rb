@@ -1,6 +1,6 @@
 class Integrations::TelegramController < ApplicationController
   def callback
-    unless TelegramService.instance.verify_telegram_login(callback_params, Rails.configuration.x.telegram.bot_token)
+    unless TelegramService.instance.verify_telegram_login(callback_params.to_h, Rails.configuration.x.telegram.bot_token)
       flash.alert = 'Failed to login with Telegram!'
       return redirect_to account_index_path
     end
@@ -19,6 +19,6 @@ class Integrations::TelegramController < ApplicationController
   private
 
   def callback_params
-    params.permit(:id, :first_name, :username, :auth_date, :hash)
+    params.permit(:id, :first_name, :username, :photo_url, :auth_date, :hash)
   end
 end

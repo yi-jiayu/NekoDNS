@@ -11,7 +11,8 @@ RSpec.describe TelegramService do
         first_name: 'first_name',
         username: 'username',
         auth_date: '1561898119',
-        hash: 'e6ff35208039c53f10962731498da6ca7fb40d541819a8f9cc8046b2f9c2d812' }
+        photo_url: 'https://t.me/i/userpic/123/username.jpg',
+        hash: '890d941a191758cede47e69159732fd1af8943c8e2bb1fd5f010d3d61087e61d' }
     end
     let(:token) { 'bot_token' }
 
