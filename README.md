@@ -1,3 +1,6 @@
+[![pipeline status](https://gitlab.com/yi-jiayu/nekodns/badges/master/pipeline.svg)](https://gitlab.com/yi-jiayu/nekodns/commits/master)
+[![codecov](https://codecov.io/gl/yi-jiayu/nekodns/branch/master/graph/badge.svg?token=zYcWkS4Bse)](https://codecov.io/gl/yi-jiayu/nekodns)
+
 # NekoDNS
 Chatops for your DNS records
 
