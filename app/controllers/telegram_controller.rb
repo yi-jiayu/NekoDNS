@@ -6,7 +6,6 @@ class TelegramController < ApplicationController
   attr_reader :command, :args
 
   def create
-    return continue_in :link_telegram_account if command == 'start'
     return unless current_user
 
     @chat_id = chat_id
@@ -18,10 +17,6 @@ class TelegramController < ApplicationController
     when 'setrecord'
       continue_in :set_record
     end
-  end
-
-  def link_telegram_account
-    TelegramService.instance.link_telegram_account(args, telegram_user_id)
   end
 
   def list_domains
