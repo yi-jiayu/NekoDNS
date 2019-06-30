@@ -10,6 +10,12 @@ class Integrations::TelegramController < ApplicationController
     redirect_to account_index_path
   end
 
+  def destroy
+    current_user.update(telegram_user_id: nil)
+    flash.notice = 'Telegram account unlinked!'
+    redirect_to account_index_path
+  end
+
   private
 
   def callback_params

@@ -18,5 +18,6 @@ Rails.application.routes.draw do
 
   namespace :integrations do
     get 'telegram/callback', to: 'telegram#callback'
+    delete 'telegram', to: 'telegram#destroy'
   end
 end

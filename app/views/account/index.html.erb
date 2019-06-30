@@ -17,6 +17,7 @@
               data-request-access="write"></script>
     <% else %>
       <p>Telegram account linked!</p>
+      <%= link_to 'Unlink Telegram account', integrations_telegram_path, method: :delete, class: 'btn btn-danger' %>
     <% end %>
   </section>
 </div>

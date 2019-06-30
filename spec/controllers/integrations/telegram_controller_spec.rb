@@ -50,4 +50,19 @@ RSpec.describe Integrations::TelegramController, type: :controller do
       end
     end
   end
+
+  describe '#destroy' do
+    let(:user) { create(:user, :with_telegram_user_id) }
+
+    it "removes the user's telegram_user_id" do
+      delete :destroy
+      expect(user.reload.telegram_user_id).to be_nil
+    end
+
+    it 'flashes a notice and redirects to the account page' do
+      delete :destroy
+      expect(flash.notice).to eq('Telegram account unlinked!')
+      expect(response).to redirect_to(account_index_path)
+    end
+  end
 end
