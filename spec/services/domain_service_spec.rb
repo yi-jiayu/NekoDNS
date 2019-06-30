@@ -12,46 +12,66 @@ RSpec.describe DomainService do
 
   describe '#create_domain' do
     let(:user) { create(:user) }
-    let(:root) { 'example.com' }
-    let(:domain) { create(:domain, user: user) }
+    let(:root) { Faker::Internet.domain_name }
 
-    before do
-      allow(Domain).to receive(:new).and_return(domain)
-      allow(route53_client).to receive(:create_hosted_zone).and_return(create_hosted_zone_response(hosted_zone_id))
-    end
+    context "when the user has not created a domain with the given root before" do
+      let(:domain) { create(:domain, user: user, root: root) }
 
-    it 'creates a new Route53 Hosted Zone' do
-      expected_arguments = {
-        name: domain.root,
-        caller_reference: domain.route53_create_hosted_zone_caller_reference,
-        hosted_zone_config: {
-          comment: "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS",
-        },
-      }
-      expect(route53_client).to receive(:create_hosted_zone).with(expected_arguments)
-      subject.create_domain(user, root)
-    end
+      before do
+        allow(route53_client).to receive(:create_hosted_zone).and_return(create_hosted_zone_response(hosted_zone_id))
+      end
 
-    it 'returns the created domain' do
-      domain = subject.create_domain(user, root)
-      expect(domain).to eq(Domain.last)
-    end
+      it 'creates a new domain for the user' do
+        expect(Domain).to receive(:new).with(user: user, root: root).and_call_original
+        subject.create_domain(user, root)
+      end
 
-    it 'sets the hosted zone ID on the domain' do
-      domain = subject.create_domain(user, root)
-      expect(domain.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
+      it 'creates a new Route53 Hosted Zone' do
+        allow(Domain).to receive(:new).and_return(domain)
+        expected_arguments = {
+          name: domain.root,
+          caller_reference: domain.route53_create_hosted_zone_caller_reference,
+          hosted_zone_config: {
+            comment: "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS",
+          },
+        }
+        expect(route53_client).to receive(:create_hosted_zone).with(expected_arguments)
+        subject.create_domain(user, root)
+      end
+
+      it 'returns the new domain' do
+        allow(Domain).to receive(:new).and_return(domain)
+        returned_domain = subject.create_domain(user, root)
+        expect(returned_domain).to eq(domain)
+      end
+
+      it 'sets the hosted zone ID on the domain' do
+        domain = subject.create_domain(user, root)
+        expect(domain.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
+      end
     end
 
     context 'when a domain belonging to the user with the same root already exists' do
-      let!(:existing_domain) { create(:domain, user: user, root: root) }
+      context 'and it already has a hosted zone ID' do
+        let!(:domain) { create(:domain, user: user, root: root, route53_hosted_zone_id: hosted_zone_id) }
 
-      before do
-        allow(Domain).to receive(:new).and_call_original
-      end
+        it 'does not create a new hosted zone' do
+          expect(route53_client).not_to receive(:create_hosted_zone)
+          suppress DomainService::Errors::DomainAlreadyExists do
+            subject.create_domain(user, root)
+          end
+        end
 
-      it 'does not create a new domain' do
-        domain = subject.create_domain(user, root)
-        expect(domain.id).to eq(existing_domain.id)
+        it 'does not create a new domain' do
+          expect(Domain).not_to receive(:new)
+          suppress DomainService::Errors::DomainAlreadyExists do
+            subject.create_domain(user, root)
+          end
+        end
+
+        it 'raises a DomainService::Errors::DomainAlreadyExists exception' do
+          expect { subject.create_domain(user, root) }.to raise_error(DomainService::Errors::DomainAlreadyExists)
+        end
       end
     end
   end

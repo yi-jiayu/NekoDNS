@@ -3,6 +3,8 @@ class DomainService
 
   def create_domain(user, root)
     domain = Domain.find_or_create_by(user: user, root: root)
+    raise Errors::DomainAlreadyExists.new if domain.route53_hosted_zone_id.present?
+
     response = client.create_hosted_zone(
       name: domain.root,
       caller_reference: domain.route53_create_hosted_zone_caller_reference,
@@ -52,6 +54,12 @@ class DomainService
   end
 
   module Errors
+    class DomainAlreadyExists < StandardError
+      def message
+        'Domain already exists'
+      end
+    end
+
     class DomainNotEmpty < StandardError
       def message
         'Domain not empty'
