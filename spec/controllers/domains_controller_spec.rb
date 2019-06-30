@@ -9,6 +9,45 @@ RSpec.describe DomainsController, type: :controller do
     login_as(user)
   end
 
+  describe '#create' do
+    let(:params) { { root: root } }
+
+    before do
+      allow(DomainService.instance).to receive(:create_domain).and_return(domain)
+    end
+
+    it 'calls DomainService#create_domain' do
+      expect(DomainService.instance).to receive(:create_domain).with(user, root)
+      post :create, params: params
+    end
+
+    it 'redirects to the domain page' do
+      post :create, params: params
+      expect(response).to redirect_to(domain)
+    end
+
+    context "when the provided domain root contains a trailing dot" do
+      let(:root) { 'example.com.' }
+
+      it 'removes it before calliinng DomainService#create_domain' do
+        expect(DomainService.instance).to receive(:create_domain).with(user, 'example.com')
+        post :create, params: params
+      end
+    end
+
+    context "when DomainService#create_domain raises DomainService::Errors::DomainAlreadyExists" do
+      before do
+        allow(DomainService.instance).to receive(:create_domain).and_raise(DomainService::Errors::DomainAlreadyExists)
+      end
+
+      it 'flashes an alert and redirects back to new' do
+        post :create, params: params
+        expect(flash.alert).to eq('You have already created a domain with that root!')
+        expect(response).to redirect_to(new_domain_path)
+      end
+    end
+  end
+
   describe '#destroy' do
     before do
       allow(DomainService.instance).to receive(:delete_domain).and_return(true)

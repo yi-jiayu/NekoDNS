@@ -9,9 +9,12 @@ class DomainsController < ApplicationController
   end
 
   def create
-    root = params.require(:root)
+    root = params.require(:root).delete_suffix('.')
     domain = DomainService.instance.create_domain(current_user, root)
     redirect_to domain
+  rescue DomainService::Errors::DomainAlreadyExists
+    flash.alert = 'You have already created a domain with that root!'
+    redirect_to new_domain_path
   end
 
   def delete
