@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   resources :account, only: [:index]
 
-  resources :domains, param: :root, constraints: { root: %r{[^/]+} } do
+  resources :domains, except: [:edit, :update], param: :root, constraints: { root: %r{[^/]+} } do
     get 'delete', on: :member
   end
 

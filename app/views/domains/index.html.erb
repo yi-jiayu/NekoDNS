@@ -1,6 +1,10 @@
 <h1>My domains</h1>
 
+<% if Features.enabled?(:add_domain) %>
 <a href="<%= new_domain_path %>" class="btn btn-primary">Add a domain</a>
+<% else %>
+  <button class="btn btn-primary" title="Adding domains is currently disabled." disabled>Add a domain</button>
+<% end %>
 
 <div class="my-3">
   <div class="list-group">

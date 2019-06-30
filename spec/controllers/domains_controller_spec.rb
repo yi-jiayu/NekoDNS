@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe DomainsController, type: :controller do
@@ -26,7 +28,28 @@ RSpec.describe DomainsController, type: :controller do
       expect(response).to redirect_to(domain)
     end
 
-    context "when the provided domain root contains a trailing dot" do
+    context 'when the create domain feature is disabled' do
+      before do
+        allow(Features).to receive(:enabled?).with(:add_domain).and_return(false)
+      end
+
+      it 'flashes a notice' do
+        post :create, params: params
+        expect(flash.notice).to eq('Adding new domains is currently disabled.')
+      end
+
+      it 'redirects to the domains index' do
+        post :create, params: params
+        expect(response).to redirect_to(domains_path)
+      end
+
+      it 'does not call DomainService#create_domain' do
+        post :create, params: params
+        expect(DomainService.instance).not_to have_received(:create_domain)
+      end
+    end
+
+    context 'when the provided domain root contains a trailing dot' do
       let(:root) { 'example.com.' }
 
       it 'removes it before calliinng DomainService#create_domain' do
@@ -35,7 +58,7 @@ RSpec.describe DomainsController, type: :controller do
       end
     end
 
-    context "when DomainService#create_domain raises DomainService::Errors::DomainAlreadyExists" do
+    context 'when DomainService#create_domain raises DomainService::Errors::DomainAlreadyExists' do
       before do
         allow(DomainService.instance).to receive(:create_domain).and_raise(DomainService::Errors::DomainAlreadyExists)
       end
@@ -110,7 +133,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq("Domain not found!")
+        expect(flash.alert).to eq('Domain not found!')
       end
 
       it 'redirects to the domains list' do
@@ -124,7 +147,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq("Domain not found!")
+        expect(flash.alert).to eq('Domain not found!')
       end
 
       it 'redirects to the domain list' do

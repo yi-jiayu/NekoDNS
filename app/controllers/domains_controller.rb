@@ -9,6 +9,11 @@ class DomainsController < ApplicationController
   end
 
   def create
+    unless Features.enabled?(:add_domain)
+      flash.notice = 'Adding new domains is currently disabled.'
+      return redirect_to domains_path
+    end
+
     root = params.require(:root).delete_suffix('.')
     domain = DomainService.instance.create_domain(current_user, root)
     redirect_to domain
