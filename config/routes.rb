@@ -8,12 +8,15 @@ Rails.application.routes.draw do
 
   post 'telegram/updates', to: 'telegram#create', defaults: { format: :json }
 
-  get 'account/integrations/telegram', to: 'account#link_telegram_account', as: :link_telegram_account
   get 'auth/:provider/callback', to: 'sessions#create', as: :oauth_callback
 
   resources :account, only: [:index]
 
   resources :domains, param: :root, constraints: { root: %r{[^/]+} } do
     get 'delete', on: :member
+  end
+
+  namespace :integrations do
+    get 'telegram/callback', to: 'telegram#callback'
   end
 end
