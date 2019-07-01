@@ -11,5 +11,11 @@ RSpec.describe Features do
     it 'returns true' do
       expect(Features.enabled?(feature)).to be true
     end
+
+    context 'when in the test environment' do
+      it 'enables all features' do
+        expect(Features.enabled?(:some_feature)).to be true
+      end
+    end
   end
 end
