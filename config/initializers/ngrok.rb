@@ -7,9 +7,10 @@ if Rails.env.development? && defined?(Rails::Server)
     remote_uri = URI(tunnels['public_url'])
     puts "initializers/ngrok.rb: found ngrok tunnel from #{local_uri} to #{remote_uri}"
     ngrok_host = remote_uri.host
-    puts "initializers/ngrok.rb: adding #{ngrok_host} to config.hosts and setting config.ngrok_host"
     Rails.application.configure do
+      puts "initializers/ngrok.rb: setting config.ngrok_host to #{ngrok_host}"
       config.ngrok_host = ngrok_host
+      puts "initializers/ngrok.rb: adding #{ngrok_host} to config.hosts"
       config.hosts << ngrok_host
     end
   rescue Errno::ECONNREFUSED
