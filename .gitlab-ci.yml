@@ -30,12 +30,19 @@ rspec:
 
 staging:
   stage: deploy
+  variables:
+    ENVIRONMENT: staging
   cache: {}
   before_script:
+    - curl -sL https://sentry.io/get-cli/ | bash
     - gem install dpl
     - curl https://cli-assets.heroku.com/install.sh | sh
   script:
+    - VERSION=$(sentry-cli releases propose-version)
+    - sentry-cli releases new -p nekodns $VERSION
+    - sentry-cli releases set-commits --auto $VERSION
     - dpl --provider=heroku --app=nekodns-staging --api-key=$HEROKU_API_KEY
+    - sentry-cli releases deploys $VERSION new -e $ENVIRONMENT
     - heroku run --app=nekodns-staging --exit-code rake db:migrate
   only:
     - master
