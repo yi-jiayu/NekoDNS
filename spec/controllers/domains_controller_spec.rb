@@ -13,20 +13,77 @@ RSpec.describe DomainsController, type: :controller do
     login_as(user)
   end
 
-  describe '#new' do
-    let(:credentials) { create_list(:credential, 2, user: user) }
-
-    it 'assigns @credentials' do
-      get :new
-      expect(assigns(:credentials)).to eq(credentials)
-    end
-  end
-
   describe '#create' do
     let(:params) { { root: root } }
 
     before do
       allow(domain_service).to receive(:create_domain).and_return(domain)
+    end
+
+    context 'when creating a managed domain' do
+      let(:params) { { root: 'example.com', managed: 'true' } }
+
+      it 'initialises the domain service object without credentials' do
+        post :create, params: params
+        expect(DomainService).to have_received(:new).with(no_args)
+      end
+    end
+
+    context 'when creating a domain using user credentials' do
+      let(:credential) { create(:credential, user: user) }
+      let(:params) { { root: 'example.com', managed: 'false', credential_id: credential.id.to_s } }
+
+      it 'initialises the domain service object with credentials' do
+        post :create, params: params
+        expect(DomainService).to have_received(:new).with(credential)
+      end
+
+      context 'when params[:credential_id] does not exist' do
+        let(:params) { { root: 'example.com', managed: 'false', credential_id: '-1' } }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('Credentials not found!')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
+
+      context 'when params[:credential_id] does not belong to the user' do
+        let(:credential) { create(:credential) }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('Credentials not found!')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
+
+      context 'when the provided credentials are invalid' do
+        let(:domain_service) { double(DomainService) }
+
+        before do
+          allow(DomainService).to receive(:new).and_return(domain_service)
+          allow(domain_service).to receive(:create_domain).and_raise(DomainService::Errors::AccessDenied)
+        end
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('The selected credentials were rejected by AWS. Is your policy set up correctly?')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
     end
 
     it 'calls DomainService#create_domain' do
