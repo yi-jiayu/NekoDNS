@@ -10,6 +10,8 @@ class DomainService
                                                                      external_id: credential.external_id)
                 Aws::Route53::Client.new(credentials: credential_provider)
               end
+  rescue Aws::STS::Errors::AccessDenied
+    raise Errors::AccessDenied
   end
 
   def create_domain(user, root)
@@ -80,6 +82,12 @@ class DomainService
     class RecordInvalid < StandardError
       def message
         'Record invalid'
+      end
+    end
+
+    class AccessDenied < StandardError
+      def message
+        'Access denied'
       end
     end
   end

@@ -43,6 +43,16 @@ RSpec.describe DomainService do
       it 'sets @client' do
         expect(described_class.new(credential).client).to eq(route53_client)
       end
+
+      context 'when Aws::AssumeRoleCredentials#new raises Aws::STS::Errors::AccessDenied' do
+        before do
+          allow(Aws::AssumeRoleCredentials).to receive(:new).and_raise(Aws::STS::Errors::AccessDenied.new(nil, 'Access denied'))
+        end
+
+        it 're-raises DomainService::Errors::AccessDenied' do
+          expect { described_class.new(credential) }.to raise_error(DomainService::Errors::AccessDenied)
+        end
+      end
     end
   end
 
