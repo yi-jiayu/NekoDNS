@@ -10,14 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_30_140113) do
+ActiveRecord::Schema.define(version: 2019_07_01_024437) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "credentials", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "external_id", null: false
+    t.string "arn", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_credentials_on_user_id"
+  end
+
   create_table "domains", force: :cascade do |t|
     t.string "root", null: false
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "route53_create_hosted_zone_caller_reference"
@@ -35,5 +45,6 @@ ActiveRecord::Schema.define(version: 2019_06_30_140113) do
     t.integer "telegram_user_id"
   end
 
+  add_foreign_key "credentials", "users"
   add_foreign_key "domains", "users"
 end

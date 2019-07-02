@@ -1,0 +1,1 @@
+Rails.configuration.aws_account_id = ENV['AWS_ACCOUNT_ID']

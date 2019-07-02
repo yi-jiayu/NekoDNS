@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     get 'delete', on: :member
   end
 
+  resources :credentials, except: [:edit, :delete]
+
   namespace :integrations do
     get 'telegram/callback', to: 'telegram#callback'
     delete 'telegram', to: 'telegram#destroy'
