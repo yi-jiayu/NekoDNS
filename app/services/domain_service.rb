@@ -1,5 +1,16 @@
 class DomainService
-  include Singleton
+  attr_reader :client
+
+  def initialize(credential = nil)
+    @client = if credential.nil?
+                Aws::Route53::Client.new
+              else
+                credential_provider = Aws::AssumeRoleCredentials.new(role_arn: credential.arn,
+                                                                     role_session_name: 'NekoDNS',
+                                                                     external_id: credential.external_id)
+                Aws::Route53::Client.new(credentials: credential_provider)
+              end
+  end
 
   def create_domain(user, root)
     domain = Domain.find_or_create_by(user: user, root: root)
@@ -74,10 +85,6 @@ class DomainService
   end
 
   private
-
-  def client
-    @client ||= Aws::Route53::Client.new
-  end
 
   def comment_for(domain)
     "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS"

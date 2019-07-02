@@ -6,6 +6,7 @@ class DomainsController < ApplicationController
   end
 
   def new
+    @credentials = current_user.credentials
   end
 
   def create
@@ -15,7 +16,7 @@ class DomainsController < ApplicationController
     end
 
     root = params.require(:root).delete_suffix('.')
-    domain = DomainService.instance.create_domain(current_user, root)
+    domain = DomainService.new.create_domain(current_user, root)
     redirect_to domain
   rescue DomainService::Errors::DomainAlreadyExists
     flash.alert = 'You have already created a domain with that root!'
@@ -27,7 +28,7 @@ class DomainsController < ApplicationController
 
   def destroy
     begin
-      deleted = DomainService.instance.delete_domain(@domain)
+      deleted = DomainService.new.delete_domain(@domain)
     rescue DomainService::Errors::DomainNotEmpty
       flash.alert = 'Your domain could not be deleted because it contains records other than the default SOA and NS records.'
       return redirect_to(@domain)

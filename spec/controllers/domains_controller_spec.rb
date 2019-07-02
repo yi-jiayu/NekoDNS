@@ -6,20 +6,31 @@ RSpec.describe DomainsController, type: :controller do
   let(:user) { create(:user) }
   let(:domain) { create(:domain, user: user) }
   let(:root) { domain.root }
+  let(:domain_service) { double(DomainService) }
 
   before do
+    allow(DomainService).to receive(:new).and_return(domain_service)
     login_as(user)
+  end
+
+  describe '#new' do
+    let(:credentials) { create_list(:credential, 2, user: user) }
+
+    it 'assigns @credentials' do
+      get :new
+      expect(assigns(:credentials)).to eq(credentials)
+    end
   end
 
   describe '#create' do
     let(:params) { { root: root } }
 
     before do
-      allow(DomainService.instance).to receive(:create_domain).and_return(domain)
+      allow(domain_service).to receive(:create_domain).and_return(domain)
     end
 
     it 'calls DomainService#create_domain' do
-      expect(DomainService.instance).to receive(:create_domain).with(user, root)
+      expect(domain_service).to receive(:create_domain).with(user, root)
       post :create, params: params
     end
 
@@ -45,7 +56,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'does not call DomainService#create_domain' do
         post :create, params: params
-        expect(DomainService.instance).not_to have_received(:create_domain)
+        expect(domain_service).not_to have_received(:create_domain)
       end
     end
 
@@ -53,14 +64,14 @@ RSpec.describe DomainsController, type: :controller do
       let(:root) { 'example.com.' }
 
       it 'removes it before calliinng DomainService#create_domain' do
-        expect(DomainService.instance).to receive(:create_domain).with(user, 'example.com')
+        expect(domain_service).to receive(:create_domain).with(user, 'example.com')
         post :create, params: params
       end
     end
 
     context 'when DomainService#create_domain raises DomainService::Errors::DomainAlreadyExists' do
       before do
-        allow(DomainService.instance).to receive(:create_domain).and_raise(DomainService::Errors::DomainAlreadyExists)
+        allow(domain_service).to receive(:create_domain).and_raise(DomainService::Errors::DomainAlreadyExists)
       end
 
       it 'flashes an alert and redirects back to new' do
@@ -73,11 +84,11 @@ RSpec.describe DomainsController, type: :controller do
 
   describe '#destroy' do
     before do
-      allow(DomainService.instance).to receive(:delete_domain).and_return(true)
+      allow(DomainService.new).to receive(:delete_domain).and_return(true)
     end
 
     it 'calls DomainService#delete_domain' do
-      expect(DomainService.instance).to receive(:delete_domain).with(domain)
+      expect(DomainService.new).to receive(:delete_domain).with(domain)
       delete :destroy, params: { root: root }
     end
 
@@ -93,7 +104,7 @@ RSpec.describe DomainsController, type: :controller do
 
     context 'when the domain cannot be deleted because it still has records left' do
       before do
-        allow(DomainService.instance).to receive(:delete_domain).and_raise(DomainService::Errors::DomainNotEmpty)
+        allow(DomainService.new).to receive(:delete_domain).and_raise(DomainService::Errors::DomainNotEmpty)
       end
 
       it 'flashes an alert with the reason' do
@@ -109,7 +120,7 @@ RSpec.describe DomainsController, type: :controller do
 
     context 'when the domain could not be deleted for some other reason' do
       before do
-        allow(DomainService.instance).to receive(:delete_domain).and_return(false)
+        allow(DomainService.new).to receive(:delete_domain).and_return(false)
       end
 
       it 'flashes an alert' do
@@ -127,7 +138,7 @@ RSpec.describe DomainsController, type: :controller do
       let(:domain) { create(:domain) }
 
       it 'does not call DomainService#delete_domain' do
-        expect(DomainService.instance).not_to receive(:delete_domain)
+        expect(DomainService.new).not_to receive(:delete_domain)
         delete :destroy, params: { root: root }
       end
 

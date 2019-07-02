@@ -42,7 +42,7 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
       return render :flash
     end
     @record = Record.new(type: type, name: name, value: value, ttl: ttl.to_i)
-    DomainService.instance.set_record(@domain, @record)
+    DomainService.new.set_record(@domain, @record)
   rescue DomainService::Errors::RecordInvalid
     flash.alert = 'The record you specified was invalid!'
     return render :flash

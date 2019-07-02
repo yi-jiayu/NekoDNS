@@ -1,13 +1,49 @@
 require 'rails_helper'
 
 RSpec.describe DomainService do
-  subject { DomainService.instance }
-
   let(:route53_client) { double(Aws::Route53::Client) }
   let(:hosted_zone_id) { 'hosted zone ID' }
 
   before do
-    allow(DomainService.instance).to receive(:client).and_return(route53_client)
+    allow(Aws::Route53::Client).to receive(:new).and_return(route53_client)
+  end
+
+  describe '#initialize' do
+    context 'when no credential is provided' do
+      it 'initialises an Aws::Route53::Client using default credentials' do
+        expect(Aws::Route53::Client).to receive(:new).with(no_args)
+        described_class.new
+      end
+
+      it 'sets @client' do
+        expect(described_class.new.client).to eq(route53_client)
+      end
+    end
+
+    context 'when a credential is provided' do
+      let(:credential) { build(:credential) }
+      let(:assume_role_credentials) { double(Aws::AssumeRoleCredentials) }
+
+      before do
+        allow(Aws::AssumeRoleCredentials).to receive(:new).and_return(assume_role_credentials)
+      end
+
+      it 'builds an Aws::AssumeRoleCredentials' do
+        expect(Aws::AssumeRoleCredentials).to receive(:new).with(role_arn: credential.arn,
+                                                                 external_id: credential.external_id,
+                                                                 role_session_name: 'NekoDNS')
+        described_class.new(credential)
+      end
+
+      it 'initialises an Aws::Route53::Client using assume role credentials' do
+        expect(Aws::Route53::Client).to receive(:new).with(credentials: assume_role_credentials)
+        described_class.new(credential)
+      end
+
+      it 'sets @client' do
+        expect(described_class.new(credential).client).to eq(route53_client)
+      end
+    end
   end
 
   describe '#create_domain' do

@@ -22,9 +22,11 @@ RSpec.describe Domain, type: :model do
   describe '.records' do
     let(:domain) { build(:domain, route53_hosted_zone_id: 'hosted zone ID') }
     let(:records) { 'records' }
+    let(:domain_service) { double(DomainService) }
 
     it "calls DomainService#list_records with the domain's route53_hosted_zone_id and returns the result" do
-      expect(DomainService.instance).to receive(:list_records).with(domain.route53_hosted_zone_id).and_return(records)
+      expect(DomainService).to receive(:new).and_return(domain_service)
+      expect(domain_service).to receive(:list_records).with(domain.route53_hosted_zone_id).and_return(records)
       expect(domain.records).to eq(records)
     end
   end

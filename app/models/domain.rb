@@ -8,7 +8,7 @@ class Domain < ApplicationRecord
   end
 
   def records
-    DomainService.instance.list_records(route53_hosted_zone_id)
+    DomainService.new.list_records(route53_hosted_zone_id)
   end
 
   private
