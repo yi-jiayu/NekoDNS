@@ -16,9 +16,9 @@ RSpec.describe CredentialsController, type: :controller do
   end
 
   describe '#new' do
-    it 'sets aws_external_id on the session' do
+    it 'sets :aws_external_id on the session' do
       get :new
-      expect(session[:aws_external_id]).to be_present
+      expect(session).to include(:aws_external_id)
     end
   end
 
@@ -34,9 +34,14 @@ RSpec.describe CredentialsController, type: :controller do
     it 'creates a new credential from the current user, params and session' do
       post :create, params: params
       expect(Credential).to have_received(:create).with(user: user,
-                                                        name: params[:credential][:name],
-                                                        arn: params[:credential][:arn],
-                                                        external_id: request.session[:aws_external_id])
+                                                        name: credential.name,
+                                                        arn: credential.arn,
+                                                        external_id: credential.external_id)
+    end
+
+    it 'removes :aws_external_id from the session afterwards' do
+      post :create, params: params
+      expect(request.session).not_to include(:aws_external_id)
     end
 
     context 'when the params are invalid' do

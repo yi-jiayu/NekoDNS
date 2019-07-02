@@ -14,6 +14,7 @@ class CredentialsController < ApplicationController
                                     arn: credential_params[:arn],
                                     external_id: session[:aws_external_id])
     return render :new unless @credential.errors.empty?
+    session.delete(:aws_external_id)
     redirect_to @credential
   end
 
