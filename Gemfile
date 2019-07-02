@@ -35,7 +35,7 @@ gem 'figaro'
 gem 'omniauth-github'
 gem 'rubocop-rails', require: false
 gem 'rubocop-rspec', require: false
-
+gem "sentry-raven"
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
