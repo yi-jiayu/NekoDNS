@@ -6,10 +6,8 @@ RSpec.describe DomainsController, type: :controller do
   let(:user) { create(:user) }
   let(:domain) { create(:domain, user: user) }
   let(:root) { domain.root }
-  let(:domain_service) { double(DomainService) }
 
   before do
-    allow(DomainService).to receive(:new).and_return(domain_service)
     login_as(user)
   end
 
@@ -17,25 +15,25 @@ RSpec.describe DomainsController, type: :controller do
     let(:params) { { root: root } }
 
     before do
-      allow(domain_service).to receive(:create_domain).and_return(domain)
+      allow(CreateZone).to receive(:call).and_return(domain)
     end
 
     context 'when creating a managed domain' do
-      let(:params) { { root: 'example.com', managed: 'true' } }
+      let(:params) { { root: root, managed: 'true' } }
 
-      it 'initialises the domain service object without credentials' do
+      it 'calls CreateZone with nil for credential' do
         post :create, params: params
-        expect(DomainService).to have_received(:new).with(no_args)
+        expect(CreateZone).to have_received(:call).with(user, root, nil)
       end
     end
 
     context 'when creating a domain using user credentials' do
       let(:credential) { create(:credential, user: user) }
-      let(:params) { { root: 'example.com', managed: 'false', credential_id: credential.id.to_s } }
+      let(:params) { { root: root, managed: 'false', credential_id: credential.id.to_s } }
 
-      it 'initialises the domain service object with credentials' do
+      it 'calls CreateZone with the provided credential' do
         post :create, params: params
-        expect(DomainService).to have_received(:new).with(credential)
+        expect(CreateZone).to have_received(:call).with(user, root, credential)
       end
 
       context 'when params[:credential_id] does not exist' do
@@ -67,11 +65,8 @@ RSpec.describe DomainsController, type: :controller do
       end
 
       context 'when the provided credentials are invalid' do
-        let(:domain_service) { double(DomainService) }
-
         before do
-          allow(DomainService).to receive(:new).and_return(domain_service)
-          allow(domain_service).to receive(:create_domain).and_raise(DomainService::Errors::AccessDenied)
+          allow(CreateZone).to receive(:call).and_raise(Credential::AccessDenied)
         end
 
         it 'flashes an alert' do
@@ -84,11 +79,6 @@ RSpec.describe DomainsController, type: :controller do
           expect(response).to render_template(:new)
         end
       end
-    end
-
-    it 'calls DomainService#create_domain' do
-      expect(domain_service).to receive(:create_domain).with(user, root)
-      post :create, params: params
     end
 
     it 'redirects to the domain page' do
@@ -111,24 +101,24 @@ RSpec.describe DomainsController, type: :controller do
         expect(response).to redirect_to(domains_path)
       end
 
-      it 'does not call DomainService#create_domain' do
+      it 'does not call CreateZone' do
         post :create, params: params
-        expect(domain_service).not_to have_received(:create_domain)
+        expect(CreateZone).not_to have_received(:call)
       end
     end
 
     context 'when the provided domain root contains a trailing dot' do
       let(:root) { 'example.com.' }
 
-      it 'removes it before calliinng DomainService#create_domain' do
-        expect(domain_service).to receive(:create_domain).with(user, 'example.com')
+      it 'removes it before calling CreateZone' do
+        expect(CreateZone).to receive(:call).with(user, 'example.com', anything)
         post :create, params: params
       end
     end
 
-    context 'when DomainService#create_domain raises DomainService::Errors::DomainAlreadyExists' do
+    context 'when CreateZone#call raises CreateZone::ZoneAlreadyExists' do
       before do
-        allow(domain_service).to receive(:create_domain).and_raise(DomainService::Errors::DomainAlreadyExists)
+        allow(CreateZone).to receive(:call).and_raise(CreateZone::ZoneAlreadyExists)
       end
 
       it 'flashes an alert and redirects back to new' do
@@ -141,12 +131,12 @@ RSpec.describe DomainsController, type: :controller do
 
   describe '#destroy' do
     before do
-      allow(DomainService.new).to receive(:delete_domain).and_return(true)
+      allow(DeleteZone).to receive(:call).and_return(true)
     end
 
-    it 'calls DomainService#delete_domain' do
-      expect(DomainService.new).to receive(:delete_domain).with(domain)
+    it 'calls DeleteZone' do
       delete :destroy, params: { root: root }
+      expect(DeleteZone).to have_received(:call).with(domain)
     end
 
     it 'flashes a notice that the domain was deleted' do
@@ -161,7 +151,7 @@ RSpec.describe DomainsController, type: :controller do
 
     context 'when the domain cannot be deleted because it still has records left' do
       before do
-        allow(DomainService.new).to receive(:delete_domain).and_raise(DomainService::Errors::DomainNotEmpty)
+        allow(DeleteZone).to receive(:call).and_raise(DeleteZone::ZoneNotEmpty)
       end
 
       it 'flashes an alert with the reason' do
@@ -177,7 +167,7 @@ RSpec.describe DomainsController, type: :controller do
 
     context 'when the domain could not be deleted for some other reason' do
       before do
-        allow(DomainService.new).to receive(:delete_domain).and_return(false)
+        allow(DeleteZone).to receive(:call).and_return(false)
       end
 
       it 'flashes an alert' do
@@ -194,9 +184,13 @@ RSpec.describe DomainsController, type: :controller do
     context 'when the domain does not belong to the current user' do
       let(:domain) { create(:domain) }
 
-      it 'does not call DomainService#delete_domain' do
-        expect(DomainService.new).not_to receive(:delete_domain)
+      before do
+        allow(DeleteZone).to receive(:call)
+      end
+
+      it 'does not call DeleteZone' do
         delete :destroy, params: { root: root }
+        expect(DeleteZone).not_to have_received(:call)
       end
 
       it 'flashes an error message' do

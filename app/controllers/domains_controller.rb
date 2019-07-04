@@ -17,22 +17,17 @@ class DomainsController < ApplicationController
 
     root = create_params.require(:root).delete_suffix('.')
     managed = create_params[:managed] != 'false'
-    domain_service = if managed
-                       DomainService.new
-                     else
-                       credential = Credential.find_by(id: create_params.require(:credential_id).to_i, user: current_user)
-                       if credential.nil?
-                         flash.alert = 'Credentials not found!'
-                         return render :new
-                       end
-                       DomainService.new(credential)
-                     end
-    domain = domain_service.create_domain(current_user, root)
+    credential = Credential.find_by(id: create_params.require(:credential_id).to_i, user: current_user) unless managed
+    if !managed && credential.nil?
+      flash.alert = 'Credentials not found!'
+      return render :new
+    end
+    domain = CreateZone.call(current_user, root, credential)
     redirect_to domain
-  rescue DomainService::Errors::DomainAlreadyExists
+  rescue CreateZone::ZoneAlreadyExists
     flash.alert = 'You have already created a domain with that root!'
     redirect_to new_domain_path
-  rescue DomainService::Errors::AccessDenied
+  rescue Credential::AccessDenied
     flash.alert = 'The selected credentials were rejected by AWS. Is your policy set up correctly?'
     render :new
   end
@@ -42,8 +37,8 @@ class DomainsController < ApplicationController
 
   def destroy
     begin
-      deleted = DomainService.new.delete_domain(@domain)
-    rescue DomainService::Errors::DomainNotEmpty
+      deleted = DeleteZone.call(@domain)
+    rescue DeleteZone::ZoneNotEmpty
       flash.alert = 'Your domain could not be deleted because it contains records other than the default SOA and NS records.'
       return redirect_to(@domain)
     end

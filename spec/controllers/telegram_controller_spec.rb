@@ -65,19 +65,17 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
     context 'when the telegram_user_id is linked to a user' do
       let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
       let(:domain) { create(:domain, user: user) }
-      let(:domain_service) { double(DomainService) }
       let(:record) { build(:record) }
       let(:text) { "/setrecord #{domain.root} #{record.type} #{record.name} #{record.value} #{record.ttl}" }
       let(:params) { text_message(text: text, from_id: telegram_user_id, chat_id: telegram_user_id) }
 
       before do
-        allow(DomainService).to receive(:new).and_return(domain_service)
-        allow(domain_service).to receive(:set_record)
+        allow(SetRecord).to receive(:call)
       end
 
-      it 'calls DomainService#set_record' do
-        expect(domain_service).to receive(:set_record).with(domain, record)
+      it 'calls SetRecord' do
         post :create, params: params
+        expect(SetRecord).to have_received(:call).with(domain, record)
       end
 
       it 'renders the set record view' do
@@ -109,9 +107,9 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`))
         end
       end
 
-      context 'when DomainService#set_record raises DomainService::Errors::RecordInvalid' do
+      context 'when SetRecord#call raises SetRecord::RecordInvalid' do
         before do
-          allow(domain_service).to receive(:set_record).and_raise(DomainService::Errors::RecordInvalid)
+          allow(SetRecord).to receive(:call).and_raise(SetRecord::RecordInvalid)
         end
 
         it 'flashes an alert' do

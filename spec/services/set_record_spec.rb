@@ -19,7 +19,7 @@ RSpec.describe SetRecord do
     end
 
     context 'the provided domain has a credential' do
-      let(:domain) { create(:domain, :with_credential, user: user) }
+      let(:domain) { create(:domain, :with_credential) }
 
       it 'creates a Route53Client with it' do
         SetRecord.new(domain, record)
