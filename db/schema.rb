@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_01_024437) do
+ActiveRecord::Schema.define(version: 2019_07_02_113521) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,6 +32,8 @@ ActiveRecord::Schema.define(version: 2019_07_01_024437) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "route53_create_hosted_zone_caller_reference"
     t.string "route53_hosted_zone_id"
+    t.bigint "credential_id"
+    t.index ["credential_id"], name: "index_domains_on_credential_id"
     t.index ["root", "user_id"], name: "index_domains_on_root_and_user_id"
     t.index ["user_id"], name: "index_domains_on_user_id"
   end
@@ -46,5 +48,6 @@ ActiveRecord::Schema.define(version: 2019_07_01_024437) do
   end
 
   add_foreign_key "credentials", "users"
+  add_foreign_key "domains", "credentials"
   add_foreign_key "domains", "users"
 end

@@ -1,5 +1,7 @@
 class Domain < ApplicationRecord
   belongs_to :user
+  belongs_to :credential, optional: true
+
   before_save :trim_trailing_dot_from_root
   before_create :generate_route53_create_hosted_zone_caller_reference
 
