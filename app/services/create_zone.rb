@@ -2,6 +2,7 @@ class CreateZone < ApplicationService
   def initialize(user, root, credential = nil)
     @user = user
     @root = root
+    @credential = credential
     @client = Route53Client.new(credential)
   end
 
@@ -16,7 +17,7 @@ class CreateZone < ApplicationService
         comment: "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS",
       },
     )
-    domain.update(route53_hosted_zone_id: response.hosted_zone.id)
+    domain.update(route53_hosted_zone_id: response.hosted_zone.id, credential: @credential)
     domain
   end
 

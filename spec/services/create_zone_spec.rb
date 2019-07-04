@@ -66,6 +66,17 @@ RSpec.describe CreateZone do
         domain = subject.call
         expect(domain.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
       end
+
+      context 'when a credential is provided while creating the zone' do
+        subject { CreateZone.new(user, root, credential) }
+
+        let(:credential) { create(:credential) }
+
+        it 'associates the created domain with that credential' do
+          domain = subject.call
+          expect(domain.reload.credential).to eq(credential)
+        end
+      end
     end
 
     context 'when a domain belonging to the user with the same root already exists' do
