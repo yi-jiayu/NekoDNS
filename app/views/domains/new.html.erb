@@ -2,9 +2,14 @@
 <%= bootstrap_form_tag url: domains_path do |f| %>
   <%= f.text_field :root, placeholder: 'example.com' %>
 
-  <%= f.form_group :managed, label: { text: "Managed by NekoDNS" }, help: 'Choose "No" to have NekoDNS create a DNS zone using an AWS IAM role you provided.' do %>
-    <%= f.radio_button :managed, 'true', label: "Yes", disabled: !Features.enabled?(:add_domain) %>
+  <%= f.form_group :managed, label: { text: "Managed by NekoDNS?" }, help: 'Choose "No" to have NekoDNS create a DNS zone using an AWS IAM role you provided.' do %>
+    <% if Features.enabled?(:managed_domains) %>
+      <%= f.radio_button :managed, 'true', label: "Yes", checked: true %>
     <%= f.radio_button :managed, 'false', label: "No" %>
+    <% else %>
+      <%= f.radio_button :managed, 'true', label: "Yes", disabled: !Features.enabled?(:manage_domain) %>
+      <%= f.radio_button :managed, 'false', label: "No", checked: true %>
+    <% end %>
   <% end %>
 
   <% if current_user.credentials.empty? %>

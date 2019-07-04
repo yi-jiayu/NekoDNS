@@ -10,13 +10,14 @@ class DomainsController < ApplicationController
   end
 
   def create
-    unless Features.enabled?(:add_domain)
-      flash.notice = 'Adding new domains is currently disabled.'
-      return redirect_to domains_path
-    end
-
     root = create_params.require(:root).delete_suffix('.')
     managed = create_params[:managed] != 'false'
+
+    if managed && !Features.enabled?(:managed_domains)
+      flash.alert = 'Managed domains are currently not enabled!'
+      return render :new
+    end
+
     credential = Credential.find_by(id: create_params.require(:credential_id).to_i, user: current_user) unless managed
     if !managed && credential.nil?
       flash.alert = 'Credentials not found!'

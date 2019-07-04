@@ -25,6 +25,22 @@ RSpec.describe DomainsController, type: :controller do
         post :create, params: params
         expect(CreateZone).to have_received(:call).with(user, root, nil)
       end
+
+      context 'when the :managed_domains feature is not enabled' do
+        before do
+          allow(Features).to receive(:enabled?).with(:managed_domains).and_return(false)
+        end
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('Managed domains are currently not enabled!')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
     end
 
     context 'when creating a domain using user credentials' do
@@ -84,27 +100,6 @@ RSpec.describe DomainsController, type: :controller do
     it 'redirects to the domain page' do
       post :create, params: params
       expect(response).to redirect_to(domain)
-    end
-
-    context 'when the create domain feature is disabled' do
-      before do
-        allow(Features).to receive(:enabled?).with(:add_domain).and_return(false)
-      end
-
-      it 'flashes a notice' do
-        post :create, params: params
-        expect(flash.notice).to eq('Adding new domains is currently disabled.')
-      end
-
-      it 'redirects to the domains index' do
-        post :create, params: params
-        expect(response).to redirect_to(domains_path)
-      end
-
-      it 'does not call CreateZone' do
-        post :create, params: params
-        expect(CreateZone).not_to have_received(:call)
-      end
     end
 
     context 'when the provided domain root contains a trailing dot' do
