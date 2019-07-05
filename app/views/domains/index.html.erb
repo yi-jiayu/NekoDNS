@@ -1,11 +1,11 @@
-<h1>My domains</h1>
+<h1>My Zones</h1>
 
-<a href="<%= new_domain_path %>" class="btn btn-primary">Add a domain</a>
+<a href="<%= new_domain_path %>" class="btn btn-primary">Create new zone</a>
 
 <div class="my-3">
   <div class="list-group">
     <% if @domains.empty? %>
-      <div class="list-group-item">You haven't added any domains yet!</div>
+      <div class="list-group-item">You haven't created any zones yet!</div>
     <% else %>
       <% @domains.each do |domain| %>
         <a href="<%= domain_path(domain) %>" class="list-group-item list-group-item-action"><%= domain.root %></a>

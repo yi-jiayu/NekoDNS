@@ -1,8 +1,8 @@
-<h1>Add a domain</h1>
+<h1>Create new zone</h1>
 <%= bootstrap_form_tag url: domains_path do |f| %>
   <%= f.text_field :root, placeholder: 'example.com' %>
 
-  <%= f.form_group :managed, label: { text: "Managed by NekoDNS?" }, help: 'Choose "No" to have NekoDNS create a DNS zone using an AWS IAM role you provided.' do %>
+  <%= f.form_group :managed, label: { text: "Managed by NekoDNS?" }, help: 'Choose "No" to have NekoDNS create a DNS zone using one of your AWS IAM roles.' do %>
     <% if Features.enabled?(:managed_domains) %>
       <%= f.radio_button :managed, 'true', label: "Yes", checked: true %>
     <%= f.radio_button :managed, 'false', label: "No" %>
@@ -15,8 +15,8 @@
   <% if current_user.credentials.empty? %>
     <%= f.select :credential_id, ['No credentials available', nil], { label: 'Credentials' }, { disabled: true } %>
   <% else %>
-    <%= f.select :credential_id, options_from_collection_for_select(current_user.credentials, :id, :name), { label: 'Credentials', help: 'Not applicable for managed domains.' } %>
+    <%= f.select :credential_id, options_from_collection_for_select(current_user.credentials, :id, :name), { label: 'Credentials', help: 'Not applicable for managed zones.' } %>
   <% end %>
 
-  <%= f.primary 'Add domain' %>
+  <%= f.primary 'Create' %>
 <% end %>

@@ -33,7 +33,7 @@ RSpec.describe DomainsController, type: :controller do
 
         it 'flashes an alert' do
           post :create, params: params
-          expect(flash.alert).to eq('Managed domains are currently not enabled!')
+          expect(flash.alert).to eq('Managed zones are currently not enabled!')
         end
 
         it 'renders :new' do
@@ -118,7 +118,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an alert and redirects back to new' do
         post :create, params: params
-        expect(flash.alert).to eq('You have already created a domain with that root!')
+        expect(flash.alert).to eq('You have already created a zone with that root!')
         expect(response).to redirect_to(new_domain_path)
       end
     end
@@ -136,7 +136,7 @@ RSpec.describe DomainsController, type: :controller do
 
     it 'flashes a notice that the domain was deleted' do
       delete :destroy, params: { root: root }
-      expect(flash.notice).to eq('Domain deleted!')
+      expect(flash.notice).to eq('Zone deleted!')
     end
 
     it 'redirects to the domains list' do
@@ -151,7 +151,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an alert with the reason' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq('Your domain could not be deleted because it contains records other than the default SOA and NS records.')
+        expect(flash.alert).to eq('your zone could not be deleted because it contains records other than the default SOA and NS records.')
       end
 
       it 'redirects to the domain page' do
@@ -190,7 +190,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq('Domain not found!')
+        expect(flash.alert).to eq('Zone not found!')
       end
 
       it 'redirects to the domains list' do
@@ -204,7 +204,7 @@ RSpec.describe DomainsController, type: :controller do
 
       it 'flashes an error message' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq('Domain not found!')
+        expect(flash.alert).to eq('Zone not found!')
       end
 
       it 'redirects to the domain list' do

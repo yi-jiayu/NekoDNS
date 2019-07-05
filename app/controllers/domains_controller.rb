@@ -14,7 +14,7 @@ class DomainsController < ApplicationController
     managed = create_params[:managed] != 'false'
 
     if managed && !Features.enabled?(:managed_domains)
-      flash.alert = 'Managed domains are currently not enabled!'
+      flash.alert = 'Managed zones are currently not enabled!'
       return render :new
     end
 
@@ -26,7 +26,7 @@ class DomainsController < ApplicationController
     domain = CreateZone.call(current_user, root, credential)
     redirect_to domain
   rescue CreateZone::ZoneAlreadyExists
-    flash.alert = 'You have already created a domain with that root!'
+    flash.alert = 'You have already created a zone with that root!'
     redirect_to new_domain_path
   rescue Credential::AccessDenied
     flash.alert = 'The selected credentials were rejected by AWS. Is your policy set up correctly?'
@@ -40,14 +40,14 @@ class DomainsController < ApplicationController
     begin
       deleted = DeleteZone.call(@domain)
     rescue DeleteZone::ZoneNotEmpty
-      flash.alert = 'Your domain could not be deleted because it contains records other than the default SOA and NS records.'
+      flash.alert = 'your zone could not be deleted because it contains records other than the default SOA and NS records.'
       return redirect_to(@domain)
     end
     unless deleted
       flash.alert = 'An unknown error occurred while trying to delete your domain.'
       return redirect_to(@domain)
     end
-    flash.notice = 'Domain deleted!' if deleted
+    flash.notice = 'Zone deleted!' if deleted
     redirect_to domains_path
   end
 
@@ -63,7 +63,7 @@ class DomainsController < ApplicationController
   def set_current_domain
     @domain = Domain.find_by(root: params[:root], user: current_user)
     if @domain.nil?
-      flash.alert = 'Domain not found!'
+      flash.alert = 'Zone not found!'
       redirect_to(domains_path)
     end
   end
