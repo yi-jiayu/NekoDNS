@@ -13,22 +13,22 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
     expect(response).to be_successful
   end
 
-  context 'list domains command' do
+  context 'list zones command' do
     context 'when the telegram_user_id is linked to a user' do
       let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
-      let(:domains) { create_list(:domain, 2, user: user) }
-      let(:params) { text_message(text: '/listdomains', from_id: telegram_user_id, chat_id: telegram_user_id) }
+      let(:zones) { create_list(:zone, 2, user: user) }
+      let(:params) { text_message(text: '/listzones', from_id: telegram_user_id, chat_id: telegram_user_id) }
 
-      it 'renders the list domains view' do
+      it 'renders the list zones view' do
         post :create, params: params
         expect(assigns(:chat_id)).to eq(telegram_user_id)
-        expect(assigns(:domains)).to eq(domains)
-        expect(subject).to render_template(:list_domains)
+        expect(assigns(:zones)).to eq(zones)
+        expect(subject).to render_template(:list_zones)
       end
     end
 
     context 'when the telegram_user_id is not linked to a user' do
-      let(:params) { text_message(text: '/listdomains', from_id: nil, chat_id: telegram_user_id) }
+      let(:params) { text_message(text: '/listzones', from_id: nil, chat_id: telegram_user_id) }
 
       it 'returns no content' do
         post :create, params: params
@@ -40,13 +40,13 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
   context 'list records command' do
     context 'when the telegram_user_id is linked to a user' do
       let(:user) { create(:user, telegram_user_id: telegram_user_id) }
-      let(:domain) { create(:domain, user: user) }
-      let(:params) { text_message(text: "/listrecords #{domain.root}", from_id: telegram_user_id, chat_id: telegram_user_id) }
+      let(:zone) { create(:zone, user: user) }
+      let(:params) { text_message(text: "/listrecords #{zone.root}", from_id: telegram_user_id, chat_id: telegram_user_id) }
 
       it 'renders the list records view' do
         post :create, params: params
         expect(assigns(:chat_id)).to eq(telegram_user_id)
-        expect(assigns(:domain)).to eq(domain)
+        expect(assigns(:zone)).to eq(zone)
         expect(subject).to render_template(:list_records)
       end
     end
@@ -64,9 +64,9 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
   context 'set record command' do
     context 'when the telegram_user_id is linked to a user' do
       let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
-      let(:domain) { create(:domain, user: user) }
+      let(:zone) { create(:zone, user: user) }
       let(:record) { build(:record) }
-      let(:text) { "/setrecord #{domain.root} #{record.type} #{record.name} #{record.value} #{record.ttl}" }
+      let(:text) { "/setrecord #{zone.root} #{record.type} #{record.name} #{record.value} #{record.ttl}" }
       let(:params) { text_message(text: text, from_id: telegram_user_id, chat_id: telegram_user_id) }
 
       before do
@@ -75,13 +75,13 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
       it 'calls SetRecord' do
         post :create, params: params
-        expect(SetRecord).to have_received(:call).with(domain, record)
+        expect(SetRecord).to have_received(:call).with(zone, record)
       end
 
       it 'renders the set record view' do
         post :create, params: params
         expect(assigns(:chat_id)).to eq(telegram_user_id)
-        expect(assigns(:domain)).to eq(domain)
+        expect(assigns(:zone)).to eq(zone)
         expect(assigns(:record)).to eq(record)
         expect(subject).to render_template(:set_record)
       end
@@ -91,18 +91,18 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
         it 'flashes an alert' do
           post :create, params: params
-          expect(flash.alert).to eq(%q(Usage: /setrecord domain type name value TTL
+          expect(flash.alert).to eq(%q(Usage: /setrecord zone type name value TTL
 Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`))
           expect(response).to render_template(:flash)
         end
       end
 
-      context 'when the domain is not found' do
-        let(:text) { "/setrecord no_such_domain #{record.type} #{record.name} #{record.value} #{record.ttl}" }
+      context 'when the zone is not found' do
+        let(:text) { "/setrecord no_such_zone #{record.type} #{record.name} #{record.value} #{record.ttl}" }
 
         it 'flashes an alert' do
           post :create, params: params
-          expect(flash.alert).to eq('Domain not found!')
+          expect(flash.alert).to eq('Zone not found!')
           expect(response).to render_template(:flash)
         end
       end

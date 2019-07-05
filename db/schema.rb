@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_02_113521) do
+ActiveRecord::Schema.define(version: 2019_07_05_132808) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,19 +25,6 @@ ActiveRecord::Schema.define(version: 2019_07_02_113521) do
     t.index ["user_id"], name: "index_credentials_on_user_id"
   end
 
-  create_table "domains", force: :cascade do |t|
-    t.string "root", null: false
-    t.bigint "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.string "route53_create_hosted_zone_caller_reference"
-    t.string "route53_hosted_zone_id"
-    t.bigint "credential_id"
-    t.index ["credential_id"], name: "index_domains_on_credential_id"
-    t.index ["root", "user_id"], name: "index_domains_on_root_and_user_id"
-    t.index ["user_id"], name: "index_domains_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "provider"
     t.string "uid"
@@ -47,7 +34,20 @@ ActiveRecord::Schema.define(version: 2019_07_02_113521) do
     t.integer "telegram_user_id"
   end
 
+  create_table "zones", force: :cascade do |t|
+    t.string "root", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "route53_create_hosted_zone_caller_reference"
+    t.string "route53_hosted_zone_id"
+    t.bigint "credential_id"
+    t.index ["credential_id"], name: "index_zones_on_credential_id"
+    t.index ["root", "user_id"], name: "index_zones_on_root_and_user_id"
+    t.index ["user_id"], name: "index_zones_on_user_id"
+  end
+
   add_foreign_key "credentials", "users"
-  add_foreign_key "domains", "credentials"
-  add_foreign_key "domains", "users"
+  add_foreign_key "zones", "credentials"
+  add_foreign_key "zones", "users"
 end

@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe DomainsController, type: :controller do
+RSpec.describe ZonesController, type: :controller do
   let(:user) { create(:user) }
-  let(:domain) { create(:domain, user: user) }
-  let(:root) { domain.root }
+  let(:zone) { create(:zone, user: user) }
+  let(:root) { zone.root }
 
   before do
     login_as(user)
@@ -15,10 +15,10 @@ RSpec.describe DomainsController, type: :controller do
     let(:params) { { root: root } }
 
     before do
-      allow(CreateZone).to receive(:call).and_return(domain)
+      allow(CreateZone).to receive(:call).and_return(zone)
     end
 
-    context 'when creating a managed domain' do
+    context 'when creating a managed zone' do
       let(:params) { { root: root, managed: 'true' } }
 
       it 'calls CreateZone with nil for credential' do
@@ -26,9 +26,9 @@ RSpec.describe DomainsController, type: :controller do
         expect(CreateZone).to have_received(:call).with(user, root, nil)
       end
 
-      context 'when the :managed_domains feature is not enabled' do
+      context 'when the :managed_zones feature is not enabled' do
         before do
-          allow(Features).to receive(:enabled?).with(:managed_domains).and_return(false)
+          allow(Features).to receive(:enabled?).with(:managed_zones).and_return(false)
         end
 
         it 'flashes an alert' do
@@ -43,7 +43,7 @@ RSpec.describe DomainsController, type: :controller do
       end
     end
 
-    context 'when creating a domain using user credentials' do
+    context 'when creating a zone using user credentials' do
       let(:credential) { create(:credential, user: user) }
       let(:params) { { root: root, managed: 'false', credential_id: credential.id.to_s } }
 
@@ -97,12 +97,12 @@ RSpec.describe DomainsController, type: :controller do
       end
     end
 
-    it 'redirects to the domain page' do
+    it 'redirects to the zone page' do
       post :create, params: params
-      expect(response).to redirect_to(domain)
+      expect(response).to redirect_to(zone)
     end
 
-    context 'when the provided domain root contains a trailing dot' do
+    context 'when the provided zone root contains a trailing dot' do
       let(:root) { 'example.com.' }
 
       it 'removes it before calling CreateZone' do
@@ -119,7 +119,7 @@ RSpec.describe DomainsController, type: :controller do
       it 'flashes an alert and redirects back to new' do
         post :create, params: params
         expect(flash.alert).to eq('You have already created a zone with that root!')
-        expect(response).to redirect_to(new_domain_path)
+        expect(response).to redirect_to(new_zone_path)
       end
     end
   end
@@ -131,53 +131,53 @@ RSpec.describe DomainsController, type: :controller do
 
     it 'calls DeleteZone' do
       delete :destroy, params: { root: root }
-      expect(DeleteZone).to have_received(:call).with(domain)
+      expect(DeleteZone).to have_received(:call).with(zone)
     end
 
-    it 'flashes a notice that the domain was deleted' do
+    it 'flashes a notice that the zone was deleted' do
       delete :destroy, params: { root: root }
       expect(flash.notice).to eq('Zone deleted!')
     end
 
-    it 'redirects to the domains list' do
+    it 'redirects to the zones list' do
       delete :destroy, params: { root: root }
-      expect(response).to redirect_to(domains_path)
+      expect(response).to redirect_to(zones_path)
     end
 
-    context 'when the domain cannot be deleted because it still has records left' do
+    context 'when the zone cannot be deleted because it still has records left' do
       before do
         allow(DeleteZone).to receive(:call).and_raise(DeleteZone::ZoneNotEmpty)
       end
 
       it 'flashes an alert with the reason' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq('your zone could not be deleted because it contains records other than the default SOA and NS records.')
+        expect(flash.alert).to eq('Your zone could not be deleted because it contains records other than the default SOA and NS records.')
       end
 
-      it 'redirects to the domain page' do
+      it 'redirects to the zone page' do
         delete :destroy, params: { root: root }
-        expect(response).to redirect_to(domain)
+        expect(response).to redirect_to(zone)
       end
     end
 
-    context 'when the domain could not be deleted for some other reason' do
+    context 'when the zone could not be deleted for some other reason' do
       before do
         allow(DeleteZone).to receive(:call).and_return(false)
       end
 
       it 'flashes an alert' do
         delete :destroy, params: { root: root }
-        expect(flash.alert).to eq('An unknown error occurred while trying to delete your domain.')
+        expect(flash.alert).to eq('An unknown error occurred while trying to delete your zone.')
       end
 
-      it 'redirects to the domain page' do
+      it 'redirects to the zone page' do
         delete :destroy, params: { root: root }
-        expect(response).to redirect_to(domain)
+        expect(response).to redirect_to(zone)
       end
     end
 
-    context 'when the domain does not belong to the current user' do
-      let(:domain) { create(:domain) }
+    context 'when the zone does not belong to the current user' do
+      let(:zone) { create(:zone) }
 
       before do
         allow(DeleteZone).to receive(:call)
@@ -193,13 +193,13 @@ RSpec.describe DomainsController, type: :controller do
         expect(flash.alert).to eq('Zone not found!')
       end
 
-      it 'redirects to the domains list' do
+      it 'redirects to the zones list' do
         delete :destroy, params: { root: root }
-        expect(response).to redirect_to(domains_path)
+        expect(response).to redirect_to(zones_path)
       end
     end
 
-    context 'when the domain does not exist' do
+    context 'when the zone does not exist' do
       let(:root) { '.' }
 
       it 'flashes an error message' do
@@ -207,9 +207,9 @@ RSpec.describe DomainsController, type: :controller do
         expect(flash.alert).to eq('Zone not found!')
       end
 
-      it 'redirects to the domain list' do
+      it 'redirects to the zone list' do
         delete :destroy, params: { root: root }
-        expect(response).to redirect_to(domains_path)
+        expect(response).to redirect_to(zones_path)
       end
     end
   end

@@ -1,10 +1,10 @@
 class SetRecord < ApplicationService
-  attr_reader :domain, :record, :client
+  attr_reader :zone, :record, :client
 
-  def initialize(domain, record)
-    @domain = domain
+  def initialize(zone, record)
+    @zone = zone
     @record = record
-    @client = Route53Client.new(domain.credential)
+    @client = Route53Client.new(zone.credential)
   end
 
   def call
@@ -18,9 +18,9 @@ class SetRecord < ApplicationService
                       ttl: record.ttl,
                       type: record.type,
                     } }],
-        comment: "Record set created for #{domain.user} #{domain.user.id} by NekoDNS",
+        comment: "Record set created for #{zone.user} #{zone.user.id} by NekoDNS",
       },
-      hosted_zone_id: domain.route53_hosted_zone_id,
+      hosted_zone_id: zone.route53_hosted_zone_id,
     }
     client.change_resource_record_sets(params)
   rescue Aws::Route53::Errors::InvalidInput, Aws::Route53::Errors::InvalidChangeBatch

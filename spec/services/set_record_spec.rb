@@ -8,31 +8,31 @@ RSpec.describe SetRecord do
   end
 
   describe '#initialize' do
-    let(:domain) { create(:domain) }
+    let(:zone) { create(:zone) }
     let(:record) { build(:record) }
 
-    context 'the provided domain does not have a credential' do
+    context 'the provided zone does not have a credential' do
       it 'creates a Route53Client with no credential' do
-        SetRecord.new(domain, record)
+        SetRecord.new(zone, record)
         expect(Route53Client).to have_received(:new).with(nil)
       end
     end
 
-    context 'the provided domain has a credential' do
-      let(:domain) { create(:domain, :with_credential) }
+    context 'the provided zone has a credential' do
+      let(:zone) { create(:zone, :with_credential) }
 
       it 'creates a Route53Client with it' do
-        SetRecord.new(domain, record)
-        expect(Route53Client).to have_received(:new).with(domain.credential)
+        SetRecord.new(zone, record)
+        expect(Route53Client).to have_received(:new).with(zone.credential)
       end
     end
   end
 
   describe '#call' do
-    subject { SetRecord.new(domain, record) }
+    subject { SetRecord.new(zone, record) }
 
     let(:hosted_zone_id) { 'Z3M3LMPEXAMPLE' }
-    let(:domain) { create(:domain, route53_hosted_zone_id: hosted_zone_id) }
+    let(:zone) { create(:zone, route53_hosted_zone_id: hosted_zone_id) }
     let(:record) { build(:record, name: 'example.com', value: '192.0.2.44', ttl: 60, type: 'A') }
 
     before do
@@ -57,7 +57,7 @@ RSpec.describe SetRecord do
               },
             },
           ],
-          comment: "Record set created for #{domain.user} #{domain.user.id} by NekoDNS",
+          comment: "Record set created for #{zone.user} #{zone.user.id} by NekoDNS",
         },
         hosted_zone_id: "Z3M3LMPEXAMPLE",
       }

@@ -11,12 +11,12 @@ require 'rails_helper'
 #   end
 # end
 RSpec.describe TelegramHelper, type: :helper do
-  describe '#format_domains' do
-    let(:domains) { build_list(:domain, 2) }
-    let(:formatted_domains) { "#{domains[0].root}\n#{domains[1].root}" }
+  describe '#format_zones' do
+    let(:zones) { build_list(:zone, 2) }
+    let(:formatted_zones) { "#{zones[0].root}\n#{zones[1].root}" }
 
     it 'returns the formatted string' do
-      expect(helper.format_domains(domains)).to eq(formatted_domains)
+      expect(helper.format_zones(zones)).to eq(formatted_zones)
     end
   end
 end

@@ -31,40 +31,40 @@ RSpec.describe CreateZone do
   describe '#call' do
     subject { CreateZone.new(user, root) }
 
-    context "when the user has not created a domain with the given root before" do
-      let(:domain) { create(:domain, user: user, root: root) }
+    context "when the user has not created a zone with the given root before" do
+      let(:zone) { create(:zone, user: user, root: root) }
 
       before do
         allow(route53_client).to receive(:create_hosted_zone).and_return(create_hosted_zone_response(hosted_zone_id))
       end
 
-      it 'creates a new domain for the user' do
-        expect(Domain).to receive(:new).with(user: user, root: root).and_call_original
+      it 'creates a new zone for the user' do
+        expect(Zone).to receive(:new).with(user: user, root: root).and_call_original
         subject.call
       end
 
       it 'creates a new Route53 Hosted Zone' do
-        allow(Domain).to receive(:new).and_return(domain)
+        allow(Zone).to receive(:new).and_return(zone)
         expected_arguments = {
-          name: domain.root,
-          caller_reference: domain.route53_create_hosted_zone_caller_reference,
+          name: zone.root,
+          caller_reference: zone.route53_create_hosted_zone_caller_reference,
           hosted_zone_config: {
-            comment: "Hosted zone created for #{domain.user.name} (#{domain.user.id}) by NekoDNS",
+            comment: "Hosted zone created for #{zone.user.name} (#{zone.user.id}) by NekoDNS",
           },
         }
         expect(route53_client).to receive(:create_hosted_zone).with(expected_arguments)
         subject.call
       end
 
-      it 'returns the new domain' do
-        allow(Domain).to receive(:new).and_return(domain)
-        returned_domain = subject.call
-        expect(returned_domain).to eq(domain)
+      it 'returns the new zone' do
+        allow(Zone).to receive(:new).and_return(zone)
+        returned_zone = subject.call
+        expect(returned_zone).to eq(zone)
       end
 
-      it 'sets the hosted zone ID on the domain' do
-        domain = subject.call
-        expect(domain.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
+      it 'sets the hosted zone ID on the zone' do
+        zone = subject.call
+        expect(zone.reload.route53_hosted_zone_id).to eq(hosted_zone_id)
       end
 
       context 'when a credential is provided while creating the zone' do
@@ -72,16 +72,16 @@ RSpec.describe CreateZone do
 
         let(:credential) { create(:credential) }
 
-        it 'associates the created domain with that credential' do
-          domain = subject.call
-          expect(domain.reload.credential).to eq(credential)
+        it 'associates the created zone with that credential' do
+          zone = subject.call
+          expect(zone.reload.credential).to eq(credential)
         end
       end
     end
 
-    context 'when a domain belonging to the user with the same root already exists' do
+    context 'when a zone belonging to the user with the same root already exists' do
       context 'and it already has a hosted zone ID' do
-        let!(:domain) { create(:domain, user: user, root: root, route53_hosted_zone_id: hosted_zone_id) }
+        let!(:zone) { create(:zone, user: user, root: root, route53_hosted_zone_id: hosted_zone_id) }
 
         it 'does not create a new hosted zone' do
           expect(route53_client).not_to receive(:create_hosted_zone)
@@ -90,8 +90,8 @@ RSpec.describe CreateZone do
           end
         end
 
-        it 'does not create a new domain' do
-          expect(Domain).not_to receive(:new)
+        it 'does not create a new zone' do
+          expect(Zone).not_to receive(:new)
           suppress CreateZone::ZoneAlreadyExists do
             subject.call
           end

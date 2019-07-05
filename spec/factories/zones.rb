@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :domain do
+  factory :zone do
     user
     root { Faker::Internet.domain_name }
 

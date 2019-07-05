@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_many :domains
+  has_many :zones
   has_many :credentials
 
   def self.create_with_omniauth(auth)

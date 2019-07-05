@@ -2,10 +2,10 @@ require 'rails_helper'
 
 RSpec.describe 'telegram/set_record', type: :view do
   let(:chat_id) { 123 }
-  let(:domain) { build(:domain) }
+  let(:zone) { build(:zone) }
   let(:record) { build(:record) }
   let(:text) { <<~TEXT.chomp
-    Setting record for domain #{domain.root}
+    Setting record for zone #{zone.root}
     *Type:* #{record.type}
     *Name:* #{record.name}
     *Value:* #{record.value}
@@ -22,7 +22,7 @@ RSpec.describe 'telegram/set_record', type: :view do
 
   it 'renders the correct Telegram bot API request' do
     assign(:chat_id, chat_id)
-    assign(:domain, domain)
+    assign(:zone, zone)
     assign(:record, record)
 
     render

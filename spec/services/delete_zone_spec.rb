@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe DeleteZone do
   let(:user) { create(:user) }
-  let(:domain) { create(:domain, user: user) }
+  let(:zone) { create(:zone, user: user) }
   let(:route53_client) { double(Aws::Route53::Client) }
 
   before do
@@ -10,25 +10,25 @@ RSpec.describe DeleteZone do
   end
 
   describe '#initialize' do
-    context 'the provided domain does not have a credential' do
+    context 'the provided zone does not have a credential' do
       it 'creates a Route53Client with no credential' do
-        DeleteZone.new(domain)
+        DeleteZone.new(zone)
         expect(Route53Client).to have_received(:new).with(nil)
       end
     end
 
-    context 'the provided domain has a credential' do
-      let(:domain) { create(:domain, :with_credential, user: user) }
+    context 'the provided zone has a credential' do
+      let(:zone) { create(:zone, :with_credential, user: user) }
 
       it 'creates a Route53Client with it' do
-        DeleteZone.new(domain)
-        expect(Route53Client).to have_received(:new).with(domain.credential)
+        DeleteZone.new(zone)
+        expect(Route53Client).to have_received(:new).with(zone.credential)
       end
     end
   end
 
   describe '#call' do
-    subject { DeleteZone.new(domain) }
+    subject { DeleteZone.new(zone) }
 
     before do
       allow(route53_client).to receive(:delete_hosted_zone)
@@ -36,12 +36,12 @@ RSpec.describe DeleteZone do
 
     it 'calls Aws::Route53::Client#delete_hosted_zone' do
       subject.call
-      expect(route53_client).to have_received(:delete_hosted_zone).with(id: domain.route53_hosted_zone_id)
+      expect(route53_client).to have_received(:delete_hosted_zone).with(id: zone.route53_hosted_zone_id)
     end
 
-    it 'deletes the domain' do
+    it 'deletes the zone' do
       subject.call
-      expect(Domain.exists?(id: domain.id)).to be false
+      expect(Zone.exists?(id: zone.id)).to be false
     end
 
     context 'when the client raises Aws::Route53::Types::HostedZoneNotEmpty' do
@@ -55,11 +55,11 @@ RSpec.describe DeleteZone do
         expect { subject.call }.to raise_error(DeleteZone::ZoneNotEmpty)
       end
 
-      it 'does not delete the domain' do
+      it 'does not delete the zone' do
         suppress(DeleteZone::ZoneNotEmpty) do
           subject.call
         end
-        expect(Domain.exists?(id: domain.id)).to be true
+        expect(Zone.exists?(id: zone.id)).to be true
       end
     end
   end

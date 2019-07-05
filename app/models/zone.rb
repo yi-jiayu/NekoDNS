@@ -1,4 +1,4 @@
-class Domain < ApplicationRecord
+class Zone < ApplicationRecord
   belongs_to :user
   belongs_to :credential, optional: true
 

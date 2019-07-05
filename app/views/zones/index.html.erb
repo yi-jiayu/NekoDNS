@@ -1,0 +1,15 @@
+<h1>My Zones</h1>
+
+<a href="<%= new_zone_path %>" class="btn btn-primary">Create new zone</a>
+
+<div class="my-3">
+  <div class="list-group">
+    <% if @zones.empty? %>
+      <div class="list-group-item">You haven't created any zones yet!</div>
+    <% else %>
+      <% @zones.each do |zone| %>
+        <a href="<%= zone_path(zone) %>" class="list-group-item list-group-item-action"><%= zone.root %></a>
+      <% end %>
+    <% end %>
+  </div>
+</div>

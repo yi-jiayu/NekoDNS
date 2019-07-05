@@ -1,16 +1,16 @@
 require 'rails_helper'
 
-RSpec.describe Domain, type: :model do
+RSpec.describe Zone, type: :model do
   describe '#to_param' do
-    let(:domain) { build(:domain) }
+    let(:zone) { build(:zone) }
 
     it 'is linked to by root' do
-      expect(domain_path(domain)).to include(domain.root)
+      expect(zone_path(zone)).to include(zone.root)
     end
   end
 
   context 'when created' do
-    subject { build(:domain) }
+    subject { build(:zone) }
 
     it 'generates a Route53 create_hosted_zone caller reference' do
       subject.route53_create_hosted_zone_caller_reference = nil
@@ -20,7 +20,7 @@ RSpec.describe Domain, type: :model do
   end
 
   describe '.records' do
-    let(:domain) { build(:domain, route53_hosted_zone_id: 'hosted zone ID') }
+    let(:zone) { build(:zone, route53_hosted_zone_id: 'hosted zone ID') }
     let(:records) { 'records' }
 
     before do
@@ -28,16 +28,16 @@ RSpec.describe Domain, type: :model do
     end
 
     it "returns the result of ListRecords#call" do
-      expect(domain.records).to eq(records)
-      expect(ListRecords).to have_received(:call).with(domain)
+      expect(zone.records).to eq(records)
+      expect(ListRecords).to have_received(:call).with(zone)
     end
   end
 
   context 'before save' do
-    let(:domain) { build(:domain, root: 'example.com.') }
-    it 'removes trailing dots from the domain root' do
-      domain.save
-      expect(domain.reload.root).to eq('example.com')
+    let(:zone) { build(:zone, root: 'example.com.') }
+    it 'removes trailing dots from the zone root' do
+      zone.save
+      expect(zone.reload.root).to eq('example.com')
     end
   end
 end

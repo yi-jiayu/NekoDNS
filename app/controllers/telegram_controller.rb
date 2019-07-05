@@ -10,8 +10,8 @@ class TelegramController < ApplicationController
 
     @chat_id = chat_id
     case command
-    when 'listdomains'
-      continue_in :list_domains
+    when 'listzones'
+      continue_in :list_zones
     when 'listrecords'
       continue_in :list_records
     when 'setrecord'
@@ -19,30 +19,30 @@ class TelegramController < ApplicationController
     end
   end
 
-  def list_domains
-    @domains = current_user.domains
+  def list_zones
+    @zones = current_user.zones
   end
 
   def list_records
     root = args.split.first
-    @domain = Domain.find_by(root: root, user: current_user)
+    @zone = Zone.find_by(root: root, user: current_user)
   end
 
   def set_record
     params = args.split
     if params.length < 5
-      flash.alert = %q(Usage: /setrecord domain type name value TTL
+      flash.alert = %q(Usage: /setrecord zone type name value TTL
 Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
       return render :flash
     end
     root, type, name, value, ttl = params
-    @domain = Domain.find_by(root: root, user: current_user)
-    unless @domain
-      flash.alert = 'Domain not found!'
+    @zone = Zone.find_by(root: root, user: current_user)
+    unless @zone
+      flash.alert = 'Zone not found!'
       return render :flash
     end
     @record = Record.new(type: type, name: name, value: value, ttl: ttl.to_i)
-    SetRecord.call(@domain, @record)
+    SetRecord.call(@zone, @record)
   rescue SetRecord::RecordInvalid
     flash.alert = 'The record you specified was invalid!'
     return render :flash

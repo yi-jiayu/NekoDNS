@@ -1,0 +1,8 @@
+<h1><%= @zone.root %></h1>
+
+<p>Are you sure you want to delete this zone?</p>
+
+<div>
+  <%= link_to 'Back', @zone, class: 'btn btn-primary' %>
+  <%= link_to 'Delete zone', @zone, method: :delete, class: 'btn btn-danger' %>
+</div>

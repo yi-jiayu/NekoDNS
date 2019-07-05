@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'telegram/list_records', type: :view do
   let(:chat_id) { 123 }
-  let(:domain) { build(:domain, root: 'example.com') }
+  let(:zone) { build(:zone, root: 'example.com') }
   let(:records) { [
     build(:record, type: 'NS', name: 'example.com', value: 'ns1.example.com', ttl: 300),
     build(:record, type: 'A', name: 'subdomain.example.com', value: '127.0.0.1', ttl: 300),
@@ -23,12 +23,12 @@ RSpec.describe 'telegram/list_records', type: :view do
   } }
 
   before do
-    allow(domain).to receive(:records).and_return(records)
+    allow(zone).to receive(:records).and_return(records)
   end
 
   it 'renders the correct Telegram bot API request' do
     assign(:chat_id, chat_id)
-    assign(:domain, domain)
+    assign(:zone, zone)
 
     render
 

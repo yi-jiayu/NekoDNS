@@ -1,8 +1,8 @@
-class DomainsController < ApplicationController
-  before_action :set_current_domain, except: [:index, :new, :create]
+class ZonesController < ApplicationController
+  before_action :set_current_zone, except: [:index, :new, :create]
 
   def index
-    @domains = current_user.domains
+    @zones = current_user.zones
   end
 
   def new
@@ -13,7 +13,7 @@ class DomainsController < ApplicationController
     root = create_params.require(:root).delete_suffix('.')
     managed = create_params[:managed] != 'false'
 
-    if managed && !Features.enabled?(:managed_domains)
+    if managed && !Features.enabled?(:managed_zones)
       flash.alert = 'Managed zones are currently not enabled!'
       return render :new
     end
@@ -23,11 +23,11 @@ class DomainsController < ApplicationController
       flash.alert = 'Credentials not found!'
       return render :new
     end
-    domain = CreateZone.call(current_user, root, credential)
-    redirect_to domain
+    zone = CreateZone.call(current_user, root, credential)
+    redirect_to zone
   rescue CreateZone::ZoneAlreadyExists
     flash.alert = 'You have already created a zone with that root!'
-    redirect_to new_domain_path
+    redirect_to new_zone_path
   rescue Credential::AccessDenied
     flash.alert = 'The selected credentials were rejected by AWS. Is your policy set up correctly?'
     render :new
@@ -38,17 +38,17 @@ class DomainsController < ApplicationController
 
   def destroy
     begin
-      deleted = DeleteZone.call(@domain)
+      deleted = DeleteZone.call(@zone)
     rescue DeleteZone::ZoneNotEmpty
-      flash.alert = 'your zone could not be deleted because it contains records other than the default SOA and NS records.'
-      return redirect_to(@domain)
+      flash.alert = 'Your zone could not be deleted because it contains records other than the default SOA and NS records.'
+      return redirect_to(@zone)
     end
     unless deleted
-      flash.alert = 'An unknown error occurred while trying to delete your domain.'
-      return redirect_to(@domain)
+      flash.alert = 'An unknown error occurred while trying to delete your zone.'
+      return redirect_to(@zone)
     end
     flash.notice = 'Zone deleted!' if deleted
-    redirect_to domains_path
+    redirect_to zones_path
   end
 
   def show
@@ -60,11 +60,11 @@ class DomainsController < ApplicationController
     params.permit(:root, :managed, :credential_id)
   end
 
-  def set_current_domain
-    @domain = Domain.find_by(root: params[:root], user: current_user)
-    if @domain.nil?
+  def set_current_zone
+    @zone = Zone.find_by(root: params[:root], user: current_user)
+    if @zone.nil?
       flash.alert = 'Zone not found!'
-      redirect_to(domains_path)
+      redirect_to(zones_path)
     end
   end
 end
