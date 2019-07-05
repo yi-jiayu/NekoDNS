@@ -18,6 +18,11 @@ class ZonesController < ApplicationController
       return render :new
     end
 
+    if !managed && create_params[:credential_id].blank?
+      flash.alert = 'You must specify a credential to use when creating an unmanaged zone.'
+      return render :new
+    end
+
     credential = Credential.find_by(id: create_params.require(:credential_id).to_i, user: current_user) unless managed
     if !managed && credential.nil?
       flash.alert = 'Credentials not found!'

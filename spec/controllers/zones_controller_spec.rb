@@ -52,7 +52,21 @@ RSpec.describe ZonesController, type: :controller do
         expect(CreateZone).to have_received(:call).with(user, root, credential)
       end
 
-      context 'when params[:credential_id] does not exist' do
+      context 'when params[:credential_id] is not present' do
+        let(:params) { { root: 'example.com', managed: 'false' } }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('You must specify a credential to use when creating an unmanaged zone.')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
+
+      context 'when the credential specified by params[:credential_id] does not exist' do
         let(:params) { { root: 'example.com', managed: 'false', credential_id: '-1' } }
 
         it 'flashes an alert' do
