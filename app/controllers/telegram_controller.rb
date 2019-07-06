@@ -17,6 +17,8 @@ class TelegramController < ApplicationController
     when 'setrecord'
       continue_in :set_record
     end
+  rescue StandardError => e
+    Raven.capture_exception(e)
   end
 
   def list_zones

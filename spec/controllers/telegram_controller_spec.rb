@@ -8,9 +8,25 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
     request.env["HTTP_ACCEPT"] = 'application/json'
   end
 
-  # Telegram will keep trying to deliver the update if we do not return a successful status.
-  after do
-    expect(response).to be_successful
+  describe '#create' do
+    let(:error) { StandardError.new }
+
+    before do
+      allow(controller).to receive(:current_user).and_raise(error)
+      allow(Raven).to receive(:capture_exception)
+    end
+
+    context 'when any error happens' do
+      it 'returns success' do
+        post :create
+        expect(response).to be_successful
+      end
+
+      it 'sends the error to Sentry' do
+        post :create
+        expect(Raven).to have_received(:capture_exception).with(error)
+      end
+    end
   end
 
   context 'list zones command' do
