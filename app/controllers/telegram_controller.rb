@@ -84,4 +84,10 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
   def current_user
     @current_user ||= User.find_by(telegram_user_id: telegram_user_id)
   end
+
+  def set_raven_context
+    super
+    Raven.user_context(id: current_user&.id, telegram_user_id: telegram_user_id)
+    Raven.tags_context(telegram_update_id: update_params[:update_id], telegram_chat_id: chat_id)
+  end
 end
