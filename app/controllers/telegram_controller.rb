@@ -5,6 +5,13 @@ class TelegramController < ApplicationController
   before_action :set_command_and_args
   attr_reader :command, :args
 
+  # We can't catch template errors in the controller action
+  # since we are implicitly rendering so we need to do this.
+  rescue_from ActionView::TemplateError do |e|
+    Raven.capture_exception(e)
+    head :no_content
+  end
+
   def create
     return unless current_user
 
