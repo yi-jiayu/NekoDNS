@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   post 'telegram/updates', to: 'telegram#create', defaults: { format: :json }
 
-  get 'auth/:provider/callback', to: 'sessions#create', as: :oauth_callback
+  get 'auth/:provider/callback', to: 'sessions#create'
 
   resources :account, only: [:index]
 
