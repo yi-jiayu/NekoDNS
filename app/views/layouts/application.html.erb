@@ -15,12 +15,17 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+
+    <% if Rails.env.production? %>
+      <%= render 'ga' %>
+    <% end %>
   </head>
 
   <body>
   <nav class="navbar navbar-expand navbar-light bg-light">
     <div class="container">
-      <a href="<%= root_path %>" class="navbar-brand">NekoDNS <small><span class="badge badge-secondary align-text-top">ALPHA</span></small>
+      <a href="<%= root_path %>" class="navbar-brand">NekoDNS
+        <small><span class="badge badge-secondary align-text-top">ALPHA</span></small>
       </a>
 
       <ul class="navbar-nav mr-auto">
