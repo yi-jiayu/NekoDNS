@@ -3,6 +3,7 @@ require 'support/telegram_helpers'
 
 RSpec.describe TelegramController, type: :controller, telegram: true do
   let(:telegram_user_id) { 123 }
+  let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
 
   before do
     request.env["HTTP_ACCEPT"] = 'application/json'
@@ -10,7 +11,6 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
   context 'list zones command' do
     context 'when the telegram_user_id is linked to a user' do
-      let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
       let(:zones) { create_list(:zone, 2, user: user) }
       let(:params) { text_message(text: '/listzones', from_id: telegram_user_id, chat_id: telegram_user_id) }
 
@@ -34,15 +34,38 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
   context 'list records command' do
     context 'when the telegram_user_id is linked to a user' do
-      let(:user) { create(:user, telegram_user_id: telegram_user_id) }
       let(:zone) { create(:zone, user: user) }
-      let(:params) { text_message(text: "/listrecords #{zone.root}", from_id: telegram_user_id, chat_id: telegram_user_id) }
+      let(:text) { "/listrecords #{zone.root}" }
+      let(:params) { text_message(text: text, from_id: telegram_user_id, chat_id: telegram_user_id) }
 
       it 'renders the list records view' do
         post :create, params: params
         expect(assigns(:chat_id)).to eq(telegram_user_id)
         expect(assigns(:zone)).to eq(zone)
         expect(subject).to render_template(:list_records)
+      end
+
+      context 'when the user did not provide a zone' do
+        let(:text) { '/listrecords' }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq("Please specify a zone to list records for.
+Usage: `/listrecords zone_root`
+Example: `/listrecords example.com`")
+          expect(response).to render_template(:flash)
+        end
+      end
+
+      context 'when the user does not have a zone with the given root' do
+        let(:root) { 'nosuchzone' }
+        let(:text) { "/listrecords #{root}" }
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq("You don't have a zone with root `#{root}`!")
+          expect(response).to render_template(:flash)
+        end
       end
     end
 
@@ -58,7 +81,6 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
 
   context 'set record command' do
     context 'when the telegram_user_id is linked to a user' do
-      let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
       let(:zone) { create(:zone, user: user) }
       let(:record) { build(:record) }
       let(:text) { "/setrecord #{zone.root} #{record.type} #{record.name} #{record.value} #{record.ttl}" }

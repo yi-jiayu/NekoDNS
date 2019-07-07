@@ -33,7 +33,17 @@ class TelegramController < ApplicationController
 
   def list_records
     root = args.split.first
+    if root.nil?
+      flash.alert = "Please specify a zone to list records for.
+Usage: `/listrecords zone_root`
+Example: `/listrecords example.com`"
+      return render :flash
+    end
     @zone = current_user.zones.find_by(root: root)
+    if @zone.nil?
+      flash.alert = "You don't have a zone with root `#{root}`!"
+      return render :flash
+    end
   end
 
   def set_record
