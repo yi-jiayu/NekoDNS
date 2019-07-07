@@ -66,7 +66,7 @@ class ZonesController < ApplicationController
   end
 
   def set_current_zone
-    @zone = Zone.find_by(root: params[:root], user: current_user)
+    @zone = current_user.zones.find_by(root: params[:root])
     if @zone.nil?
       flash.alert = 'Zone not found!'
       redirect_to(zones_path)

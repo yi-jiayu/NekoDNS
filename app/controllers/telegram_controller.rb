@@ -33,7 +33,7 @@ class TelegramController < ApplicationController
 
   def list_records
     root = args.split.first
-    @zone = Zone.find_by(root: root, user: current_user)
+    @zone = current_user.zones.find_by(root: root)
   end
 
   def set_record
@@ -44,7 +44,7 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
       return render :flash
     end
     root, type, name, value, ttl = params
-    @zone = Zone.find_by(root: root, user: current_user)
+    @zone = current_user.zones.find_by(root: root)
     unless @zone
       flash.alert = 'Zone not found!'
       return render :flash
