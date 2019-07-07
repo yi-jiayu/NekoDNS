@@ -10,15 +10,24 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
   end
 
   context 'list zones command' do
+    let(:params) { text_message(text: '/listzones', from_id: telegram_user_id, chat_id: telegram_user_id) }
+
     context 'when the telegram_user_id is linked to a user' do
-      let(:zones) { create_list(:zone, 2, user: user) }
-      let(:params) { text_message(text: '/listzones', from_id: telegram_user_id, chat_id: telegram_user_id) }
+      let!(:zones) { create_list(:zone, 2, user: user) }
 
       it 'renders the list zones view' do
         post :create, params: params
         expect(assigns(:chat_id)).to eq(telegram_user_id)
         expect(assigns(:zones)).to eq(zones)
         expect(subject).to render_template(:list_zones)
+      end
+    end
+
+    context 'when the user has not created any zones' do
+      it 'flashes an alert' do
+        post :create, params: params
+        expect(flash.alert).to eq("You haven't created any zones yet! Head over to #{zones_url(host: request.env['HTTP_HOST'])} to create one!")
+        expect(response).to render_template(:flash)
       end
     end
 

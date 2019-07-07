@@ -29,6 +29,10 @@ class TelegramController < ApplicationController
 
   def list_zones
     @zones = current_user.zones
+    if @zones.empty?
+      flash.alert = "You haven't created any zones yet! Head over to #{zones_url} to create one!"
+      return render :flash
+    end
   end
 
   def list_records
