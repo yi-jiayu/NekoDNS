@@ -17,14 +17,30 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
     end
 
     context 'when any error happens' do
-      it 'returns success' do
-        post :create
-        expect(response).to be_successful
+      before do
+        allow(Rails.env).to receive(:production?).and_return(production)
       end
 
-      it 'sends the error to Sentry' do
-        post :create
-        expect(Raven).to have_received(:capture_exception).with(error)
+      context 'in production' do
+        let(:production) { true }
+
+        it 'returns success' do
+          post :create
+          expect(response).to be_successful
+        end
+
+        it 'sends the error to Sentry' do
+          post :create
+          expect(Raven).to have_received(:capture_exception).with(error)
+        end
+      end
+
+      context 'outside of production' do
+        let(:production) { false }
+
+        it 'raises the error' do
+          expect { post :create }.to raise_error(error)
+        end
       end
     end
   end

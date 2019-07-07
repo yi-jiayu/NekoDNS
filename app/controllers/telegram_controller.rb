@@ -10,7 +10,7 @@ class TelegramController < ApplicationController
   rescue_from ActionView::TemplateError do |e|
     Raven.capture_exception(e)
     head :no_content
-  end
+  end if Rails.env.production?
 
   def create
     return unless current_user
@@ -25,6 +25,8 @@ class TelegramController < ApplicationController
       continue_in :set_record
     end
   rescue StandardError => e
+    raise e unless Rails.env.production?
+
     Raven.capture_exception(e)
   end
 
