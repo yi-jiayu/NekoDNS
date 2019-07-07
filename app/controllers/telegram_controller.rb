@@ -5,9 +5,10 @@ class TelegramController < ApplicationController
   before_action :set_command_and_args
   attr_reader :command, :args
 
-  # We can't catch template errors in the controller action
-  # since we are implicitly rendering so we need to do this.
-  rescue_from ActionView::TemplateError do |e|
+  # In production, respond with success to Telegram webhooks
+  # even if an error occurs so that Telegram does not continuously
+  # retry the request, and manually report it to Sentry.
+  rescue_from StandardError do |e|
     Raven.capture_exception(e)
     head :no_content
   end if Rails.env.production?
@@ -24,10 +25,6 @@ class TelegramController < ApplicationController
     when 'setrecord'
       continue_in :set_record
     end
-  rescue StandardError => e
-    raise e unless Rails.env.production?
-
-    Raven.capture_exception(e)
   end
 
   def list_zones

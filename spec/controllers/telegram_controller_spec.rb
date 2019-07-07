@@ -8,43 +8,6 @@ RSpec.describe TelegramController, type: :controller, telegram: true do
     request.env["HTTP_ACCEPT"] = 'application/json'
   end
 
-  describe '#create' do
-    let(:error) { StandardError.new }
-
-    before do
-      allow(controller).to receive(:current_user).and_raise(error)
-      allow(Raven).to receive(:capture_exception)
-    end
-
-    context 'when any error happens' do
-      before do
-        allow(Rails.env).to receive(:production?).and_return(production)
-      end
-
-      context 'in production' do
-        let(:production) { true }
-
-        it 'returns success' do
-          post :create
-          expect(response).to be_successful
-        end
-
-        it 'sends the error to Sentry' do
-          post :create
-          expect(Raven).to have_received(:capture_exception).with(error)
-        end
-      end
-
-      context 'outside of production' do
-        let(:production) { false }
-
-        it 'raises the error' do
-          expect { post :create }.to raise_error(error)
-        end
-      end
-    end
-  end
-
   context 'list zones command' do
     context 'when the telegram_user_id is linked to a user' do
       let!(:user) { create(:user, telegram_user_id: telegram_user_id) }
