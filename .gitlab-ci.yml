@@ -28,6 +28,13 @@ rspec:
   script:
     - rake spec
 
+audit:
+  cache:
+    policy: pull
+  script:
+    - bundle audit check --update
+  allow_failure: true
+
 staging:
   stage: deploy
   environment:
