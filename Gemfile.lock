@@ -93,6 +93,9 @@ GEM
       actionpack (>= 5.0)
       activemodel (>= 5.0)
     builder (3.2.3)
+    bundler-audit (0.6.1)
+      bundler (>= 1.2.0, < 3)
+      thor (~> 0.18)
     byebug (11.0.1)
     capybara (3.25.0)
       addressable
@@ -365,6 +368,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.2)
   bootstrap (~> 4.3.1)
   bootstrap_form (>= 4.2.0)
+  bundler-audit
   byebug
   capybara (>= 2.15)
   codecov!
