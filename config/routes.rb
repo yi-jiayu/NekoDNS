@@ -12,6 +12,8 @@ Rails.application.routes.draw do
 
   resources :account, only: [:index]
 
+  get 'zones/import', to: 'zones#new_import'
+  post 'zones/import', to: 'zones#create_import'
   resources :zones, except: [:edit, :update], param: :root, constraints: { root: %r{[^/]+} } do
     get 'delete', on: :member
   end

@@ -1,5 +1,5 @@
 class ZonesController < ApplicationController
-  before_action :set_current_zone, except: [:index, :new, :create]
+  before_action :set_current_zone, except: [:index, :new, :create, :new_import, :create_import]
 
   def index
     @zones = current_user.zones
@@ -7,6 +7,25 @@ class ZonesController < ApplicationController
 
   def new
     @credentials = current_user.credentials
+  end
+
+  def new_import
+    @import_zone_form = ImportZoneForm.new
+  end
+
+  def create_import
+    @import_zone_form = ImportZoneForm.new(import_params)
+    return render :new_import if @import_zone_form.invalid?
+
+    credential = current_user.credentials.find(@import_zone_form.credential_id)
+    @zone = ImportZone.call(current_user, @import_zone_form.hosted_zone_id, credential)
+    redirect_to @zone
+  rescue Credential::AccessDenied
+    flash.alert = 'The credentials you specified do not have the right permissions to import this zone.'
+    render :new_import
+  rescue ImportZone::NoSuchHostedZone
+    flash.alert = 'No such hosted zone!'
+    render :new_import
   end
 
   def create
@@ -28,6 +47,7 @@ class ZonesController < ApplicationController
       flash.alert = 'Credentials not found!'
       return render :new
     end
+
     zone = CreateZone.call(current_user, root, credential)
     redirect_to zone
   rescue CreateZone::ZoneAlreadyExists
@@ -63,6 +83,10 @@ class ZonesController < ApplicationController
 
   def create_params
     params.permit(:root, :managed, :credential_id)
+  end
+
+  def import_params
+    params.require(:import_zone_form).permit(:hosted_zone_id, :credential_id)
   end
 
   def set_current_zone

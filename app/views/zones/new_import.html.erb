@@ -1,0 +1,21 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="<%= zones_path %>">Zones</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Import zone</li>
+  </ol>
+</nav>
+
+<h1>Import zone</h1>
+<p class="text-muted">Import a Route53 Hosted Zone</p>
+
+<%= bootstrap_form_for @import_zone_form, url: 'import' do |f| %>
+  <%= f.text_field :hosted_zone_id, label: 'Hosted zone ID' %>
+
+  <% if current_user.credentials.empty? %>
+    <%= f.select :credential_id, ['No credentials available', nil], { label: 'Credentials', help: 'Must have access to the specified zone' }, { disabled: true } %>
+  <% else %>
+    <%= f.select :credential_id, options_from_collection_for_select(current_user.credentials, :id, :name), { label: 'Credentials', help: 'Must have access to the specified zone' } %>
+  <% end %>
+
+  <%= f.primary 'Import zone' %>
+<% end %>

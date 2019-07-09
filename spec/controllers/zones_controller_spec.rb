@@ -138,6 +138,88 @@ RSpec.describe ZonesController, type: :controller do
     end
   end
 
+  describe '#new_import' do
+    it 'renders :new_import' do
+      get :new_import
+      expect(response).to render_template(:new_import)
+    end
+  end
+
+  describe '#create_import' do
+    let(:credential) { create(:credential, user: user) }
+
+    let(:hosted_zone_id) { 'OTSRAQTFHZTN' }
+    let(:import_zone_params) { { hosted_zone_id: hosted_zone_id, credential_id: credential.id.to_s } }
+    let(:form) { ImportZoneForm.new(import_zone_params) }
+    let(:params) { { import_zone_form: import_zone_params } }
+    let(:zone) { create(:zone) }
+
+    before do
+      allow(ImportZoneForm).to receive(:new).and_return(form)
+      allow(form).to receive(:valid?).and_return(true)
+      allow(ImportZone).to receive(:call).and_return(zone)
+    end
+
+    it 'validates parameters' do
+      post :create_import, params: params
+      expect(ImportZoneForm).to have_received(:new).with(permitted_params(import_zone_params))
+      expect(form).to have_received(:valid?)
+    end
+
+    it 'calls ImportZone' do
+      post :create_import, params: params
+      expect(ImportZone).to have_received(:call).with(user, hosted_zone_id, credential)
+    end
+
+    it 'redirects to the imported zone' do
+      post :create_import, params: params
+      expect(response).to redirect_to(zone)
+    end
+
+    context 'when params are invalid' do
+      before do
+        allow(form).to receive(:valid?).and_return(false)
+      end
+
+      it 'renders :new_import' do
+        post :create_import, params: params
+        expect(response).to render_template(:new_import)
+      end
+    end
+
+    context 'when the credentials do not have access' do
+      before do
+        allow(ImportZone).to receive(:call).and_raise(Credential::AccessDenied)
+      end
+
+      it 'flashes an alert' do
+        post :create_import, params: params
+        expect(flash.alert).to eq('The credentials you specified do not have the right permissions to import this zone.')
+      end
+
+      it 'renders :new_import' do
+        post :create_import, params: params
+        expect(response).to render_template(:new_import)
+      end
+    end
+
+    context 'when the hosted zone ID does not exist' do
+      before do
+        allow(ImportZone).to receive(:call).and_raise(ImportZone::NoSuchHostedZone)
+      end
+
+      it 'flashes an alert' do
+        post :create_import, params: params
+        expect(flash.alert).to eq('No such hosted zone!')
+      end
+
+      it 'renders :new_import' do
+        post :create_import, params: params
+        expect(response).to render_template(:new_import)
+      end
+    end
+  end
+
   describe '#destroy' do
     before do
       allow(DeleteZone).to receive(:call).and_return(true)
