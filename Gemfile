@@ -31,6 +31,7 @@ gem 'bootstrap', '~> 4.3.1'
 gem "bootstrap_form", ">= 4.2.0"
 gem 'figaro'
 gem 'omniauth-github'
+gem "omniauth-rails_csrf_protection"
 gem "sentry-raven"
 
 group :development, :test do
