@@ -12,7 +12,11 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:11-ram
+      - image: circleci/postgres:latest-ram
+        environment:
+          POSTGRES_DB: NekoDNS_test
+          POSTGRES_USER: NekoDNS
+          POSTGRES_PASSWORD: ''
 
     working_directory: ~/repo
 
