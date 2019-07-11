@@ -1,9 +1,11 @@
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<%= zones_path %>">Zones</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Import zone</li>
-  </ol>
-</nav>
+<% content_for :breadcrumbs do %>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="<%= zones_path %>">Zones</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Import zone</li>
+    </ol>
+  </nav>
+<% end %>
 
 <h1>Import zone</h1>
 <p class="text-muted">Import a Route53 Hosted Zone</p>
