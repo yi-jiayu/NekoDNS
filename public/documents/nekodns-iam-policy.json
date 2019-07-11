@@ -5,16 +5,12 @@
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
+                "route53:CreateHostedZone",
+                "route53:GetHostedZone",
                 "route53:ChangeResourceRecordSets",
                 "route53:ListResourceRecordSets",
                 "route53:DeleteHostedZone"
             ],
-            "Resource": "arn:aws:route53:::hostedzone/*"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": "route53:CreateHostedZone",
             "Resource": "*"
         }
     ]
