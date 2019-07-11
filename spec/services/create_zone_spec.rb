@@ -84,7 +84,14 @@ RSpec.describe CreateZone do
         end
 
         it 'raises CreateZone::InvalidDomainName' do
-          expect { subject.call}.to raise_error(CreateZone::InvalidDomainName)
+          expect { subject.call }.to raise_error(CreateZone::InvalidDomainName)
+        end
+
+        it 'does not create a new zone' do
+          suppress CreateZone::InvalidDomainName do
+            subject.call
+          end
+          expect(Zone.exists?(user: user, root: root)).to be false
         end
       end
     end
