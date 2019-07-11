@@ -109,6 +109,22 @@ RSpec.describe ZonesController, type: :controller do
           expect(response).to render_template(:new)
         end
       end
+
+      context 'when the provided root is invalid' do
+        before do
+          allow(CreateZone).to receive(:call).and_raise(CreateZone::InvalidDomainName)
+        end
+
+        it 'flashes an alert' do
+          post :create, params: params
+          expect(flash.alert).to eq('The provided zone root is invalid!')
+        end
+
+        it 'renders :new' do
+          post :create, params: params
+          expect(response).to render_template(:new)
+        end
+      end
     end
 
     it 'redirects to the zone page' do

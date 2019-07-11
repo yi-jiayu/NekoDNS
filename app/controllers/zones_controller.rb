@@ -56,6 +56,9 @@ class ZonesController < ApplicationController
   rescue Credential::AccessDenied
     flash.alert = 'The selected credentials were rejected by AWS. Is your policy set up correctly?'
     render :new
+  rescue CreateZone::InvalidDomainName
+    flash.alert = 'The provided zone root is invalid!'
+    render :new
   end
 
   def delete
