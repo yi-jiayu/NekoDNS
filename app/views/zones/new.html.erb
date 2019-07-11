@@ -1,11 +1,20 @@
-<h1>Create new zone</h1>
+<% content_for :breadcrumbs do %>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="<%= zones_path %>">Zones</a></li>
+      <li class="breadcrumb-item active" aria-current="page">New zone</li>
+    </ol>
+  </nav>
+<% end %>
+
+<h1>New zone</h1>
 <%= bootstrap_form_tag url: zones_path do |f| %>
   <%= f.text_field :root, placeholder: 'example.com' %>
 
   <%= f.form_group :managed, label: { text: "Managed by NekoDNS?" }, help: 'Choose "No" to have NekoDNS create a DNS zone using one of your AWS IAM roles.' do %>
     <% if Features.enabled?(:managed_zones) %>
       <%= f.radio_button :managed, 'true', label: "Yes", checked: true %>
-    <%= f.radio_button :managed, 'false', label: "No" %>
+      <%= f.radio_button :managed, 'false', label: "No" %>
     <% else %>
       <%= f.radio_button :managed, 'true', label: "Yes", disabled: !Features.enabled?(:managed_zones) %>
       <%= f.radio_button :managed, 'false', label: "No", checked: true %>
