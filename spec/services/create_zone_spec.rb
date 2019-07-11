@@ -77,6 +77,16 @@ RSpec.describe CreateZone do
           expect(zone.reload.credential).to eq(credential)
         end
       end
+
+      context 'when create_zone raises Aws::Route53::Errors::InvalidDomainName' do
+        before do
+          allow(route53_client).to receive(:create_hosted_zone).and_raise(Aws::Route53::Errors::InvalidDomainName.new(nil, 'example.com'))
+        end
+
+        it 'raises CreateZone::InvalidDomainName' do
+          expect { subject.call}.to raise_error(CreateZone::InvalidDomainName)
+        end
+      end
     end
 
     context 'when a zone belonging to the user with the same root already exists' do

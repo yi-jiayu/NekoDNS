@@ -19,11 +19,19 @@ class CreateZone < ApplicationService
     )
     zone.update(route53_hosted_zone_id: response.hosted_zone.id, credential: @credential)
     zone
+  rescue Aws::Route53::Errors::InvalidDomainName
+    raise InvalidDomainName.new
   end
 
   class ZoneAlreadyExists < StandardError
     def message
       'Zone already exists'
+    end
+  end
+
+  class InvalidDomainName < StandardError
+    def message
+      'Invalid domain name'
     end
   end
 end
