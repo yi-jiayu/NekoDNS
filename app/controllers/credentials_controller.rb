@@ -5,16 +5,12 @@ class CredentialsController < ApplicationController
 
   def new
     @credential = Credential.new
-    session[:aws_external_id] = SecureRandom.uuid
+    @credential.generate_external_id
   end
 
   def create
-    @credential = Credential.create(user: current_user,
-                                    name: credential_params[:name],
-                                    arn: credential_params[:arn],
-                                    external_id: session[:aws_external_id])
+    @credential = Credential.create(credential_params.merge(user: current_user))
     return render :new unless @credential.errors.empty?
-    session.delete(:aws_external_id)
     redirect_to @credential
   end
 
@@ -25,6 +21,6 @@ class CredentialsController < ApplicationController
   private
 
   def credential_params
-    params.require(:credential).permit(:name, :arn)
+    params.require(:credential).permit(:name, :external_id, :signed_external_id, :arn)
   end
 end
