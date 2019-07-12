@@ -1,6 +1,17 @@
+<% content_for :breadcrumbs do %>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="<%= zones_path %>">Zones</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @zone.root %></li>
+    </ol>
+  </nav>
+<% end %>
+
 <h1><%= @zone.root %></h1>
 
-<%= link_to 'Delete zone', delete_zone_path(@zone), class: 'btn btn-danger' %>
+<div>
+  <%= link_to 'Delete zone', delete_zone_path(@zone), class: 'btn btn-danger' %>
+</div>
 
 <h2>Records</h2>
 
