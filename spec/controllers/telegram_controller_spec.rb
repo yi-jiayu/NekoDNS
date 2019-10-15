@@ -134,13 +134,16 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`))
       end
 
       context 'when SetRecord#call raises SetRecord::RecordInvalid' do
+        let(:record_invalid) { SetRecord::RecordInvalid.new }
+
         before do
-          allow(SetRecord).to receive(:call).and_raise(SetRecord::RecordInvalid)
+          allow(record_invalid).to receive(:cause).and_return('Cause')
+          allow(SetRecord).to receive(:call).and_raise(record_invalid)
         end
 
         it 'flashes an alert' do
           post :create, params: params
-          expect(flash.alert).to eq('The record you specified was invalid!')
+          expect(flash.alert).to eq('The record you specified was invalid! Reason: Cause')
           expect(response).to render_template(:flash)
         end
       end

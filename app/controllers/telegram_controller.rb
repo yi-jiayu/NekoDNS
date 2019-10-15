@@ -65,8 +65,8 @@ Example: `/setrecord example.com A subdomain.example.com 93.184.216.34 300`)
     end
     @record = Record.new(type: type, name: name, value: value, ttl: ttl.to_i)
     SetRecord.call(@zone, @record)
-  rescue SetRecord::RecordInvalid
-    flash.alert = 'The record you specified was invalid!'
+  rescue SetRecord::RecordInvalid => e
+    flash.alert = "The record you specified was invalid! Reason: #{e.cause}"
     return render :flash
   end
 
