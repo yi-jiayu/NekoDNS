@@ -4,7 +4,7 @@ class ImportZoneForm
 
   attr_accessor :hosted_zone_id, :credential_id
 
-  validates_presence_of :hosted_zone_id, :credential_id
+  validates :hosted_zone_id, :credential_id, presence: true
   validate :credential_exists
 
   private

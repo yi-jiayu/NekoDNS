@@ -1,7 +1,7 @@
 class Credential < ApplicationRecord
   belongs_to :user
   attr_accessor :signed_external_id
-  validates_presence_of :name, :arn, :external_id
+  validates :name, :arn, :external_id, presence: true
   validate :external_id_verified
 
   def generate_external_id
