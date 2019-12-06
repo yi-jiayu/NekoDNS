@@ -193,7 +193,7 @@ GEM
     pg (1.1.4)
     popper_js (1.14.5)
     public_suffix (3.1.1)
-    puma (3.12.1)
+    puma (3.12.2)
     rack (2.0.7)
     rack-proxy (0.6.5)
       rack
@@ -379,7 +379,7 @@ DEPENDENCIES
   omniauth-github
   omniauth-rails_csrf_protection
   pg (>= 0.18, < 2.0)
-  puma (~> 3.11)
+  puma (~> 3.12)
   rails (~> 6.0.0.rc1)
   rails-controller-testing
   rspec-rails (~> 4.pre.0.pre.dev)
