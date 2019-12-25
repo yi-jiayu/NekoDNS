@@ -1,3 +1,7 @@
+> I've decided to deprecate this project in favour of an infrastructure as code
+> based approach like I've recently started following:
+> https://blog.jiayu.co/2019/12/managing-personal-dns-records-with-terraform/
+
 [![pipeline status](https://gitlab.com/yi-jiayu/nekodns/badges/master/pipeline.svg)](https://gitlab.com/yi-jiayu/nekodns/commits/master)
 [![codecov](https://codecov.io/gl/nekodns/nekodns/branch/master/graph/badge.svg)](https://codecov.io/gl/nekodns/nekodns)
 
@@ -19,3 +23,4 @@ requiring a full-sized web browser.
 ## Supported platforms
 
 - [Telegram](https://telegram.org/)
+
